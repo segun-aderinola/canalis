@@ -12,7 +12,7 @@
     "strictPropertyInitialization": false,
     "outDir": "./dist",
     "baseUrl": ".",
-    "target": "es6",
+    "target": "es2021",
     "sourceMap": true,
     "paths": {
       "@config/*": ["src/config/*"],

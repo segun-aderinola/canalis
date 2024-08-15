@@ -37,8 +37,6 @@ REDIS_PASSWORD=
 REDIS_USERNAME=
 ```
 
-Fill in the necessary values for your local environment. These variables are used to configure the database connection, application settings, and Redis.
-
 ## Scripts
 
 The project includes a variety of npm scripts to help with development, testing, and deployment:
