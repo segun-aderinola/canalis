@@ -1,9 +1,9 @@
-import { FastifyReply, FastifyRequest } from 'fastify';
-import httpStatus from 'http-status';
-import jwt from 'jsonwebtoken';
-import { ErrorResponse } from '@shared/utils/response.util';
+import httpStatus from "http-status";
+import jwt from "jsonwebtoken";
+import { ErrorResponse } from "@shared/utils/response.util";
+import { Request, Response } from "express";
 
-const authMiddleware = (req: FastifyRequest, res: FastifyReply, done) => {
+const authMiddleware = (req: Request, res: Response, done) => {
   try {
     const authToken = getAuthTokenFromRequestHeader(req);
     if (!authToken) {
@@ -16,12 +16,12 @@ const authMiddleware = (req: FastifyRequest, res: FastifyReply, done) => {
 
     done();
   } catch (err) {
-    return res.code(httpStatus.UNAUTHORIZED).send(ErrorResponse('You are unauthorized'));
+    return res.status(httpStatus.UNAUTHORIZED).send(ErrorResponse("You are unauthorized"));
   }
 };
 
-const getAuthTokenFromRequestHeader = (req: FastifyRequest): string | null => {
-  const authTokenSegments = (req.headers.authorization || '').split(' ');
+const getAuthTokenFromRequestHeader = (req: Request): string | null => {
+  const authTokenSegments = (req.headers.authorization || "").split(" ");
 
   return authTokenSegments.length === 2 ? authTokenSegments[1] : null;
 };

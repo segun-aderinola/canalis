@@ -1,31 +1,31 @@
-import cors from "@fastify/cors";
+import express from "express";
+import cors from "cors";
 import AppError from "@shared/error/app.error";
 import Logger from "@shared/utils/logger";
-import loggerPlugin from "@shared/utils/logger/plugin";
+// import loggerPlugin from "@shared/utils/logger/plugin";
 import { ErrorResponse } from "@shared/utils/response.util";
 import initializeDatabase from "./database";
-import { FastifyInstance } from "fastify";
-import multer from "fastify-multer";
-
+// import multer from "multer";
 import Validator from "validatorjs";
 import "./shared/subscribers/audit-log.subscriber";
 
-function bootstrapApp(fastify: FastifyInstance) {
-  registerThirdPartyModules(fastify);
+function bootstrapApp(express: express.Application) {
+  registerThirdPartyModules(express);
 
   initializeDatabase();
 
   registerCustomValidationRules();
 
-  setErrorHandler(fastify);
+  setErrorHandler(express);
 
-  registerFileHandler(fastify);
+  registerFileHandler(express);
 }
 
-function registerThirdPartyModules(fastify) {
-  fastify.register(cors, { origin: true });
+function registerThirdPartyModules(express: express.Application) {
+  express.use(cors({ origin: true }));
 
-  fastify.register(loggerPlugin);
+  // Assuming loggerPlugin is an express middleware
+  // loggerPlugin(express);
 }
 
 function registerCustomValidationRules() {
@@ -89,18 +89,18 @@ function registerCustomValidationRules() {
   );
 }
 
-function registerFileHandler(fastify: FastifyInstance) {
-  fastify.register(multer.contentParser);
+function registerFileHandler(express: express.Application) {
+  // express.use(multer.contentParser);
 }
 
-function setErrorHandler(fastify) {
-  fastify.setErrorHandler((err, request, reply) => {
+function setErrorHandler(express: express.Application) {
+  express.use((err, req, res, next) => {
     const statusCode = err.statusCode || 503;
-    const message = err instanceof AppError ? err.message : "We are unable to proces this request. Please try again.";
+    const message = err instanceof AppError ? err.message : "We are unable to process this request. Please try again.";
 
     Logger.error({ err: err.cause || err });
 
-    return reply.status(statusCode).send(ErrorResponse(message));
+    res.status(statusCode).json(ErrorResponse(message));
   });
 }
 

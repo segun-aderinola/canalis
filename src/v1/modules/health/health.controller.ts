@@ -1,16 +1,16 @@
-import { FastifyReply, FastifyRequest } from 'fastify';
-import { injectable } from 'tsyringe';
-import HealthService from './health.service';
+import { Request, Response } from "express";
+import { injectable } from "tsyringe";
+import HealthService from "./health.service";
 
 @injectable()
 class HealthController {
   constructor(private healthService: HealthService) {}
 
-  readinessCheck = async (req: FastifyRequest, res: FastifyReply) => {
+  readinessCheck = async (req: Request, res: Response) => {
     await this.healthService.readinessCheck(req, res);
   };
 
-  livelinessCheck = async (req: FastifyRequest, res: FastifyReply) => {
+  livelinessCheck = async (req: Request, res: Response) => {
     await this.healthService.livelinessCheck(req, res);
   };
 }

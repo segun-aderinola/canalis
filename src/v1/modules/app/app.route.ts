@@ -1,11 +1,13 @@
-import { FastifyPluginAsync } from 'fastify';
-import { container } from 'tsyringe';
-import AppController from './app.controller';
+import express, { Request, Response } from "express";
+import { container } from "tsyringe";
+import AppController from "./app.controller";
 
 const appController = container.resolve(AppController);
 
-const appRoute: FastifyPluginAsync = async (fastify) => {
-  fastify.get('/', {}, appController.getHello);
-};
+const app = express();
 
-export default appRoute;
+app.get("/", (req: Request, res: Response) => {
+  appController.getHello(req, res);
+});
+
+export default app;

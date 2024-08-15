@@ -1,24 +1,31 @@
-import fp from 'fastify-plugin';
-import Logger from '.';
-import { getLogLevelFromStatusCode } from './util';
+import Logger from ".";
+import { getLogLevelFromStatusCode } from "./util";
 
-function logRequest(req, reply) {
-  const logLevel = getLogLevelFromStatusCode(reply.raw.statusCode);
+function logRequest(req, res, next) {
+  res.on("finish", () => {
+    const logLevel = getLogLevelFromStatusCode(res.statusCode);
 
-  Logger[logLevel]({
-    req: req,
-    res: reply,
+    Logger[logLevel]({
+      req: req,
+      res: res,
+    });
   });
+
+  next();
 }
 
-export default fp((fastify, options, done) => {
-  fastify.addHook('preSerialization', (req, reply, payload, done) => {
-    Object.assign(reply.raw, { payload });
+function addPayloadToResponse(req, res, next) {
+  // Middleware to handle payload processing before sending the response
+  const originalSend = res.send;
+  res.send = function (body) {
+    Object.assign(res, { payload: body });
+    return originalSend.call(this, body);
+  };
 
-    done();
-  });
+  next();
+}
 
-  fastify.addHook('onResponse', logRequest);
-
-  done();
-});
+export default function loggerPlugin(app) {
+  app.use(addPayloadToResponse);
+  app.use(logRequest);
+}

@@ -1,5 +1,4 @@
 {
-  "extends": "fastify-tsconfig",
   "compilerOptions": {
     "module": "CommonJS",
     "moduleResolution": "node",

@@ -1,8 +1,8 @@
-import { FastifyReply, FastifyRequest } from "fastify";
-import { injectable } from "tsyringe";
-import Redis from "ioredis";
-import httpStatus from "http-status";
 import RedisClient from "@shared/redis-client/redis-client";
+import { Request, Response } from "express";
+import httpStatus from "http-status";
+import Redis from "ioredis";
+import { injectable } from "tsyringe";
 import { getKnexInstance } from "../../../database";
 
 @injectable()
@@ -13,25 +13,25 @@ class HealthService {
     this.redisClient = redisClient.get();
   }
 
-  async readinessCheck(req: FastifyRequest, reply: FastifyReply) {
+  async readinessCheck(req: Request, reply: Response) {
     const postgresHealth = await this.checkPostgresHealth();
     const redisHealth = await this.checkRedisHealth();
 
     if (postgresHealth.status === "UP" && redisHealth.status === "OK") {
-      reply.code(httpStatus.OK).send({
+      reply.status(httpStatus.OK).send({
         status: "UP",
         checks: [postgresHealth, redisHealth],
       });
     } else {
-      reply.code(httpStatus.SERVICE_UNAVAILABLE).send({
+      reply.status(httpStatus.SERVICE_UNAVAILABLE).send({
         status: "DOWN",
         checks: [postgresHealth, redisHealth],
       });
     }
   }
 
-  livelinessCheck(req: FastifyRequest, reply: FastifyReply) {
-    reply.code(httpStatus.OK).send({
+  livelinessCheck(req: Request, reply: Response) {
+    reply.status(httpStatus.OK).send({
       status: "UP",
     });
   }

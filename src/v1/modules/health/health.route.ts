@@ -1,13 +1,16 @@
-import { FastifyPluginAsync } from 'fastify';
-import { container } from 'tsyringe';
-import HealthController from './health.controller';
+import express, { Request, Response } from "express";
+import { container } from "tsyringe";
+import HealthController from "./health.controller";
 
 const healthController = container.resolve(HealthController);
+const router = express.Router();
 
-const healthRoute: FastifyPluginAsync = async (fastify) => {
-  fastify.get('/readyz', {}, healthController.readinessCheck);
+router.get("/readyz", (req: Request, res: Response) => {
+  healthController.readinessCheck(req, res);
+});
 
-  fastify.get('/livez', {}, healthController.livelinessCheck);
-};
+router.get("/livez", (req: Request, res: Response) => {
+  healthController.livelinessCheck(req, res);
+});
 
-export default healthRoute;
+export default router;

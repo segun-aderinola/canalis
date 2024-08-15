@@ -15,10 +15,7 @@ process
     process.exit(0);
   });
 
-app
-  .listen(appConfig.server.port)
-  .then((address) => logger.info(`${appConfig.app.name} started on ${address}`))
-  .catch((err) => {
-    logger.error({ err });
-    process.exit(1);
-  });
+app.listen(appConfig.server.port, "0.0.0.0").on("error", (err) => {
+  logger.error({ err });
+  process.exit(1);
+});
