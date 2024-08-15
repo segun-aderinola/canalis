@@ -7,6 +7,7 @@ import http from "http";
 import bootstrapApp from "./bootstrap";
 import RouteVersion from "@config/route.config";
 import routes from "./shared/routes/index.routes";
+import logger from "@shared/utils/logger";
 
 class App {
   private app: express.Application;
@@ -39,7 +40,7 @@ class App {
 
   public listen(port: number, address = "0.0.0.0") {
     return this.server.listen(port, address, () => {
-      console.log(`Server listening on ${address}:${port}`);
+      logger.info(`Server listening on ${address}:${port}`);
     });
   }
 }
