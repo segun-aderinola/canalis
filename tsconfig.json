@@ -14,6 +14,19 @@
     "baseUrl": ".",
     "target": "es2021",
     "sourceMap": true,
+    "pretty": true,
+    "noEmitOnError": true,
+    "strict": true,
+    "resolveJsonModule": true,
+    "newLine": "lf",
+    "noUnusedLocals": true,
+    "noFallthroughCasesInSwitch": true,
+    "useDefineForClassFields": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "lib": [
+      "esnext"
+    ],
     "paths": {
       "@config/*": ["src/config/*"],
       "@shared/*": ["src/shared/*"],
@@ -21,5 +34,6 @@
     }
   },
   "include": ["src/**/*.ts", "src/**/*.json"],
-  "exclude": ["node_modules", "**/*.spec.ts", "**/*.test.ts"]
+  "exclude": ["node_modules", "**/*.spec.ts", "**/*.test.ts"],
+  
 }
