@@ -4,6 +4,7 @@ import logger from "./shared/utils/logger";
 
 const app = new App();
 
+
 process
   .on("uncaughtException", (err) => {
     logger.error({ err });
