@@ -6,29 +6,22 @@ import { IUser } from "../model/user.model";
 import UserRepo from "../repositories/user.repo";
 import WalletRepo from "../repositories/wallet.repo";
 import { generateDummyAccountNumber } from "../../../../utils/helper";
+import { ErrorResponse } from "@shared/utils/response.util";
 
 @injectable()
 class UserService {
   constructor(private readonly userRepo: UserRepo, private readonly walletRepo: WalletRepo,) {}
 
-  async createUser(data: CreateUser) {
+  async createUser(data: CreateUser, res) {
     // Check if a user with the provided email already exists
     const existingUser = await this.userRepo.findOne({ email: data.email });
-    //console.log(existingUser)
     if (existingUser) {
-      // return {
-      //   status: false, // Indicate an error with `false` status
-      //   message: 'User already exists with this email',
-      // };
-      throw new Error('User already exists with this email');
+      res.send(ErrorResponse("User already exists with this email"))
     }
-  
     // If the user doesn't exist, proceed with user creation
     const user = UserFactory.createUser(data);
-    
     try {
-      const createdUser = await this.userRepo.save(user);
-      
+      const createdUser = await this.userRepo.save(user);    
       // Create a wallet for the user after successfully creating the user
       await this.createWalletForUser(createdUser);
   
@@ -52,7 +45,6 @@ class UserService {
     });
   }
   
-
   async getAll() {
     return await this.userRepo.getAll();
   }

@@ -10,6 +10,7 @@ class UserManagementController {
   getAll = async (req: Request, res) => {
     try {
       const users = await this.userService.getAll();
+      // if(users.)
       res.send(SuccessResponse("Operation successful", users));
     } catch (error: any) {
       console.log(error)
@@ -19,7 +20,7 @@ class UserManagementController {
   };
   createUser = async(req: Request, res) => {
     try {
-      const users: any  = await this.userService.createUser(req.body);
+      const users: any  = await this.userService.createUser(req.body, res);
       res.send(SuccessResponse("Operation successful", users));
     } catch (error) {
       console.log(error)
