@@ -7,6 +7,7 @@ export async function up(knex: Knex): Promise<void> {
     table.string("name").notNullable();
     table.string("email").notNullable().unique();
     table.string("phoneNumber").notNullable();
+    table.string("password").notNullable();
     table.string("meansOfId").notNullable();
     table.string("address").notNullable();
     table.string("roleId").notNullable();
@@ -19,5 +20,5 @@ export async function up(knex: Knex): Promise<void> {
 }
 
 export async function down(knex: Knex): Promise<void> {
-  return knex.schema.dropTable(DB_TABLES.MODULES);
+  return knex.schema.dropTable(DB_TABLES.USERS);
 }

@@ -27,6 +27,15 @@ class UserManagementController {
     }
     
   };
+  uploadBulkUser = async(req: Request, res) => {
+    try {
+      const users: any  = await this.userService.uploadBulkUser(req.body, res, req);
+      res.send(SuccessResponse("Operation successful", users));
+    } catch (error) {
+      console.log(error)
+    }
+    
+  };
 }
 
 export default UserManagementController;

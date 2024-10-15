@@ -19,7 +19,8 @@
     "strict": true,
     "resolveJsonModule": true,
     "newLine": "lf",
-    "noUnusedLocals": true,
+    "noUnusedLocals": false,   // Disable errors for unused local variables
+    "noUnusedParameters": false, // Disable errors for unused parameters
     "noFallthroughCasesInSwitch": true,
     "useDefineForClassFields": true,
     "forceConsistentCasingInFileNames": true,

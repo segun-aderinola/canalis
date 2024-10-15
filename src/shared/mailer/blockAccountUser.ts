@@ -1,6 +1,7 @@
 import nodemailer from "nodemailer";
 import hbs from "nodemailer-express-handlebars";
-require("dotenv").config();
+import dotenv from "dotenv"
+dotenv.config();
 
 var transporter = nodemailer.createTransport({
   service:  process.env.MAIL_SERVICE,

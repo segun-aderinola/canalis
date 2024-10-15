@@ -61,16 +61,6 @@ export function generateDummyAccountNumber(): string {
     .padStart(8, "0");
   return prefix + randomDigits;
 }
-export function maskPhoneNumber(phoneNumber: string) {
-  
-  const phoneStr = phoneNumber.toString();
-  
-  const visiblePart = phoneStr.slice(-4);
-  
-  const maskedPart = '*'.repeat(phoneStr.length - 4);
-  
-  return maskedPart + visiblePart;
-}
 
 export const generateToken = async () => {
   return crypto.randomBytes(20).toString("hex");
