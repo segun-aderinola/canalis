@@ -5,8 +5,9 @@ import UserFactory from "../factories/user.factory";
 import { IUser } from "../model/user.model";
 import UserRepo from "../repositories/user.repo";
 import WalletRepo from "../repositories/wallet.repo";
-import { generateDummyAccountNumber } from "../../../../utils/helper";
+import {generateCode, generateDummyAccountNumber} from "@shared/utils/functions.util";
 import { ErrorResponse } from "@shared/utils/response.util";
+import userAccountMail from "@shared/mailer/userAccountMail";
 
 @injectable()
 class UserService {
@@ -14,6 +15,8 @@ class UserService {
 
   async createUser(data: CreateUser, res) {
     // Check if a user with the provided email already exists
+    const password = generateCode(5);
+    data.password = password;
     const existingUser = await this.userRepo.findOne({ email: data.email });
     if (existingUser) {
       res.send(ErrorResponse("User already exists with this email"))
@@ -21,10 +24,26 @@ class UserService {
     // If the user doesn't exist, proceed with user creation
     const user = UserFactory.createUser(data);
     try {
-      const createdUser = await this.userRepo.save(user);    
+      const createdUser = await this.userRepo.save(user);
       // Create a wallet for the user after successfully creating the user
       await this.createWalletForUser(createdUser);
-  
+      
+
+      // send mail to user on account creaction success
+      const mail = {
+        subject: "User Account Creation",
+        credentials: {
+          name: user.name,
+          email: user.email.toLowerCase(),
+          password: password,
+          link: process.env.FRONTEND_BASEURL + "/login",
+        },
+      };
+
+      try {
+        await userAccountMail.send(mail);
+      } catch (error) {}
+
       return createdUser;
     } catch (error) {
       return this.handleUserCreationError(user, error);
