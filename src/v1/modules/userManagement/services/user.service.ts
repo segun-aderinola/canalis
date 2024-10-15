@@ -6,7 +6,7 @@ import { IUser } from "../model/user.model";
 import UserRepo from "../repositories/user.repo";
 import WalletRepo from "../repositories/wallet.repo";
 import {generateCode, generateDummyAccountNumber} from "@shared/utils/functions.util";
-import { ErrorResponse } from "@shared/utils/response.util";
+import { ErrorResponse, SuccessResponse } from "@shared/utils/response.util";
 import userAccountMail from "@shared/mailer/userAccountMail";
 import csvParser from "csv-parser";
 import fs from "fs";
@@ -54,7 +54,7 @@ class UserService {
     }
   }
 
-  async uploadBulkUser(data: CreateUser, res, req) {
+  async uploadBulkUser(res, req) {
     const expectedHeaders = [
       "name",
       "email",
@@ -112,25 +112,18 @@ class UserService {
           fs.unlinkSync(filePath);
 
           if (!headersValid) {
-            return res
-              .status(400)
-              .json(
-                sendError(
-                  "Invalid CSV header. Ensure the CSV has the required columns."
-                )
-              );
+            return res.send("Invalid CSV header. Ensure the CSV has the required columns.");
           }
 
-          try {
+
             const added: any[] = [];
             const not_added: any[] = [];
 
             for (const element of results) {
-              const emailNumberExist = await models.User.findOne({
-                where: { email: element.email },
-              });
+             
+              const existingUser = await this.userRepo.findOne({ email: element.email });
 
-              if (emailNumberExist) {
+              if (existingUser) {
                 not_added.push({
                   email: element.email,
                   reason: "User already exists",
@@ -138,70 +131,64 @@ class UserService {
                 // send email to admin
                 continue; // Skip existing users
               }
-
-              const password = generateCode(5);
-              const userCreate = await models.User.create(
-                {
-                  name: element.name,
-                  email: element.email,
-                  role: element.role,
-                  phoneNumber: element.phone_number,
-                  password: password,
-                  address: element.address,
-                  meansOfId: element.means_of_id,
-                  supervisor: element.supervisor,
-                  region: element.region,
-                },
-                { transaction }
-              );
-
-              await models.Wallet.create({
-                userId: userCreate.id,
-              });
-
               added.push({ email: element.email });
 
-              // Send user account creation email
-              const mail = {
-                subject: "User Account Creation",
-                credentials: {
-                  name: element.name,
-                  email: element.email.toLowerCase(),
-                  password: password,
-                  link: process.env.FRONTEND_BASEURL + "/login",
-                },
-              };
-
-              try {
-                await userAccountMail.send(mail);
-              } catch (mailError) {
-                console.error("Failed to send email", mailError);
+              const password = generateCode(5);
+              const data = {
+                name: element.name,
+                phoneNumber: element.phone_number,
+                password: password,
+                meansOfId: element.means_of_id,
+                email: element.email,
+                address: element.address,
+                status: "active",
+                hasChangedPassword: false,
+                roleId: "",
+                supervisorId: ""
               }
-            }
+              
+  
+              const user = UserFactory.createUser(data);
+          try {
+            const createdUser = await this.userRepo.save(user);
+            // Create a wallet for the user after successfully creating the user
+            await this.createWalletForUser(createdUser);
+            
 
-            // Commit transaction
-            await transaction.commit();
+            // send mail to user on account creaction success
+            const mail = {
+              subject: "User Account Creation",
+              credentials: {
+                name: createdUser.name,
+                email: createdUser.email.toLowerCase(),
+                password: password,
+                link: process.env.FRONTEND_BASEURL + "/login",
+              },
+            };
+            
+            try {
+              await userAccountMail.send(mail);
+            } catch (error) {
+              console.log(error)
+            }
+            
+
             const data = {
               not_added,
               added,
             };
-            return res
-              .status(200)
-              .json(sendSuccess("Bulk upload completed", data));
+            res.send(SuccessResponse("Bulk upload completed", data));
           } catch (error: any) {
-            // Rollback in case of error
-            await transaction.rollback();
-            return res.status(500).json({ error: error.message });
+            return res.status(500).json({ status: false, message: error.message });
           }
+        }
         })
         .on("error", (err: any) => {
-          console.error("Error while reading CSV file:", err);
-          return res
-            .status(500)
-            .json({ error: "Failed to process the CSV file." });
+            console.error("Error while reading CSV file:", err);
+            return res.status(500).json({ status: false, message: "Failed to process the CSV file." });
+
         });
     } catch (error: any) {
-      await transaction.rollback();
       console.error("Transaction failed:", error);
       return res.status(500).json({ error: error.message });
     }

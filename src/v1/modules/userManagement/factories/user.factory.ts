@@ -14,7 +14,7 @@ class UserFactory {
     user.supervisorId = data.supervisorId;
     user.password = data.password;
     user.address = data.address;
-    user.hasChangedPassword = false;
+    
   
     const allowedStatuses = ["active", "inactive", "deactivated"];
     user.status = allowedStatuses.includes(data.status) ? data.status : 'active';
