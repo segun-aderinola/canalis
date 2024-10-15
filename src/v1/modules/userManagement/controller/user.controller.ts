@@ -15,8 +15,7 @@ class UserManagementController {
     } catch (error: any) {
       console.log(error)
       // res.send(ErrorResponse("Operation successful", error));
-    }
-    
+    } 
   };
   createUser = async(req: Request, res) => {
     try {

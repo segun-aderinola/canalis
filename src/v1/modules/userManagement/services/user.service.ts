@@ -27,7 +27,8 @@ class UserService {
     try {
       const createdUser = await this.userRepo.save(user);
       // Create a wallet for the user after successfully creating the user
-      await this.createWalletForUser(createdUser);
+      const wallet = await this.createWalletForUser(createdUser);
+
       
 
       // send mail to user on account creaction success
@@ -47,7 +48,11 @@ class UserService {
         console.log(error)
       }
 
-      return createdUser;
+      const returnData = {
+        user: createdUser,
+        wallet: wallet
+      }
+      return returnData;
     } catch (error: any) {
       // return this.handleUserCreationError(user, error);
       return res.status(500).json({ status: false, message: error.message })
@@ -152,7 +157,7 @@ class UserService {
           try {
             const createdUser = await this.userRepo.save(user);
             // Create a wallet for the user after successfully creating the user
-            await this.createWalletForUser(createdUser);
+            const wallet = await this.createWalletForUser(createdUser);
             
 
             // send mail to user on account creaction success
