@@ -244,14 +244,16 @@ class UserService {
     const walletData = {
       userId: user.id,
       accountNumber: generateDummyAccountNumber(),
-      balance: 0,
+      balance: 0.00,
+      ledgerBalance: 0.00,
       currency: "NGN",
     };
   
-    await this.walletRepo.save(walletData).catch((error) => {
+    return await this.walletRepo.save(walletData).catch((error) => {
       throw new Error(`Failed to create wallet for user ${user.id}: ${error.message}`);
     });
   }
+  
   
   async getAll() {
     return await this.userRepo.getAll();
