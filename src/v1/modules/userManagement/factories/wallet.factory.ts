@@ -8,8 +8,8 @@ class WalletFactory {
 
     wallet.userId = data.userId;
     wallet.accountNumber = data.accountNumber;
-    wallet.balance = 0;
-    wallet.ledgerBalance = 0;
+    wallet.balance = 0.00;
+    wallet.ledgerBalance = 0.00;
     
     return wallet;
   }
