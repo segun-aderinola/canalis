@@ -99,45 +99,7 @@ class UserService {
     });
   }
 
-  async getAll() {
-    return await this.userRepo.getAll();
-  }
-  async getAllUsers(req: any) {
-    const { page = 1, limit = 10, role, status, q } = req.query;
 
-    // Define filters
-    const filters: any = {};
-
-    if (role) {
-      filters.roleId = role;
-    }
-
-    if (status) {
-      filters.status = status;
-    }
-
-    // Call the findWhere method for filtering and adding relations if needed
-    const result = await this.userRepo.findWhere(filters);
-
-    // Handle pagination
-    const pageSize = parseInt(limit) || 10;
-    const currentPage = parseInt(page) || 1;
-    const totalRecords = result.length;
-    const totalPages = Math.ceil(totalRecords / pageSize);
-
-    const paginatedResult = result.slice(
-      (currentPage - 1) * pageSize,
-      currentPage * pageSize
-    );
-
-    // Return paginated response
-    return {
-      users: paginatedResult,
-      total_result: totalRecords,
-      current_page: currentPage,
-      total_pages: totalPages,
-    };
-  }
 }
 
 export default UserService;

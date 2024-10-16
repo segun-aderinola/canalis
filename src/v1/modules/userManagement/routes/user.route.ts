@@ -15,8 +15,4 @@ router.post("/admin/create-user", validate(createUserRules), (req: Request, res:
 });
 
 
-router.get("/admin/fetch-users", (req: Request, res: Response) => {
-  userController.getAll(req, res);
-});
-
 export default router;

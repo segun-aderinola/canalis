@@ -7,14 +7,7 @@ import UserService from "../services/user.service";
 class UserManagementController {
   constructor(private readonly userService: UserService) {}
 
-  getAll = async (req: Request, res) => {
-    try {
-      const users = await this.userService.getAllUsers(req);
-      res.send(SuccessResponse("Operation successful", users));
-    } catch (error: any) {
-      res.status(500).json(ErrorResponse("Internal Server Error: ", error.message));
-    } 
-  };
+
   createUser = async(req: Request, res) => {
     try {
       const users: any  = await this.userService.createUser(req.body, res);
