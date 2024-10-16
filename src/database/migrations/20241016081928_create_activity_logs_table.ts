@@ -5,7 +5,7 @@ export async function up(knex: Knex): Promise<void> {
   return knex.schema.createTable(DB_TABLES.ACTIVITYLOG, (table: Knex.TableBuilder) => {
     table.uuid("id").primary().defaultTo(knex.raw("uuid_generate_v4()"));
     table.string("userId").notNullable();
-    table.string("action").notNullable().unique();
+    table.string("action").notNullable();
     table.text("rawObject").notNullable();
     
     table.timestamps(true, true, true);

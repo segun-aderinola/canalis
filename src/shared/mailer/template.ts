@@ -15,7 +15,7 @@ const transporter = nodemailer.createTransport({
 });
 
 // Step 2: Create a function to send an email using Pug for rendering HTML content
-export const userAccountMail = async (options: {
+export const templateMail = async (options: {
   email: string;
   subject: string;
   name: string;
@@ -41,3 +41,14 @@ export const userAccountMail = async (options: {
   // Step 5: Send the email using Nodemailer
   return transporter.sendMail(mailOptions);
 };
+
+// // Usage example
+// sendEmail({
+//   to: "recipient@example.com",
+//   subject: "Welcome to Our Service",
+//   name: "John Doe",
+//   message: "Thank you for signing up!",
+//   link: "https://example.com",
+// })
+//   .then(() => console.log("Email sent successfully!"))
+//   .catch((error) => console.error("Error sending email:", error));

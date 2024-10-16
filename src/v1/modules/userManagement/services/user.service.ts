@@ -7,10 +7,11 @@ import UserRepo from "../repositories/user.repo";
 import WalletRepo from "../repositories/wallet.repo";
 import {generateCode, generateDummyAccountNumber} from "@shared/utils/functions.util";
 import { ErrorResponse, SuccessResponse } from "@shared/utils/response.util";
-import userAccountMail from "@shared/mailer/userAccountMail";
 import csvParser from "csv-parser";
 import fs from "fs";
 import IDVerificationService from "./id_verification.service";
+import { templateMail } from "@shared/mailer/template";
+import { userAccountMail } from "@shared/mailer/userAccountMail";
 @injectable()
 class UserService {
   constructor(
@@ -49,16 +50,13 @@ class UserService {
       // send mail to user on account creaction success
       const mail = {
         subject: "User Account Creation",
-        credentials: {
-          name: user.name,
-          email: user.email.toLowerCase(),
-          password: password,
-          link: process.env.FRONTEND_BASEURL + "/login",
-        },
+        name: user.name,
+        email: user.email.toLowerCase(),
+        password: password,
+        link: process.env.FRONTEND_BASEURL + "/login",
       };
-      //console.log(mail)
       try {
-        await userAccountMail.send(mail);
+        await userAccountMail(mail);
       } catch (error) {
         console.log(error)
       }
@@ -181,16 +179,14 @@ class UserService {
             // send mail to user on account creaction success
             const mail = {
               subject: "User Account Creation",
-              credentials: {
-                name: createdUser.name,
-                email: createdUser.email.toLowerCase(),
-                password: password,
-                link: process.env.FRONTEND_BASEURL + "/login",
-              },
+              name: createdUser.name,
+              email: createdUser.email.toLowerCase(),
+              password: password,
+              link: process.env.FRONTEND_BASEURL + "/login",
             };
             
             try {
-              await userAccountMail.send(mail);
+              await userAccountMail(mail);
             } catch (error) {
               console.log(error)
             }
@@ -236,16 +232,14 @@ class UserService {
       // send mail to user on account creaction success
       const mail = {
         subject: "User Account Creation",
-        credentials: {
-          name: user.name,
-          email: user.email.toLowerCase(),
-          password: password,
-          link: process.env.FRONTEND_BASEURL + "/login",
-        },
+        name: user.name,
+        email: user.email.toLowerCase(),
+        password: password,
+        link: process.env.FRONTEND_BASEURL + "/login",
       };
       //console.log(mail)
       try {
-        await userAccountMail.send(mail);
+        await userAccountMail(mail);
       } catch (error) {
         console.log(error)
       }
@@ -256,7 +250,6 @@ class UserService {
       return res.status(500).json({ status: false, message: error.message })
     }
   }
-  
   
   private async createWalletForUser(user: IUser) {  
     const walletData = {
@@ -272,9 +265,49 @@ class UserService {
     });
   }
   
-  
-  async getAll() {
+  async getAll2(req) {
     return await this.userRepo.getAll();
+  }
+  async getAllUsers(req: any) {
+    const { page = 1, limit = 10, role, status, q } = req.query;
+
+    // Define filters
+    const filters: any = {};
+
+    if (role) {
+      filters.role = role;
+    }
+
+    if (status) {
+      filters.status = status;
+    }
+
+    if (q) {
+      filters.$or = [
+        { name: { $like: `%${q}%` } },
+        { email: { $like: `%${q}%` } },
+        { phoneNumber: { $like: `%${q}%` } },
+      ];
+    }
+
+    // Call the findWhere method for filtering and adding relations if needed
+    const result = await this.userRepo.findWhere(filters);
+
+    // Handle pagination
+    const pageSize = parseInt(limit) || 10;
+    const currentPage = parseInt(page) || 1;
+    const totalRecords = result.length;
+    const totalPages = Math.ceil(totalRecords / pageSize);
+
+    const paginatedResult = result.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+
+    // Return paginated response
+    return {
+        users: paginatedResult,
+        total_result: totalRecords,
+        current_page: currentPage,
+        total_pages: totalPages,
+    };
   }
 
 }

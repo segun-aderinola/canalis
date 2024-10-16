@@ -5,7 +5,7 @@ export async function up(knex: Knex): Promise<void> {
   return knex.schema.createTable(DB_TABLES.OTP, (table: Knex.TableBuilder) => {
     table.uuid("id").primary().defaultTo(knex.raw("uuid_generate_v4()"));
     table.string("userId").notNullable();
-    table.string("token").notNullable().unique();
+    table.string("token").notNullable();
     table.date("expiringDatetime").notNullable();
     table.string("otpType").notNullable();
     table.integer("status").notNullable().defaultTo(0);
