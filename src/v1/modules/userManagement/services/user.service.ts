@@ -130,9 +130,22 @@ class UserService {
       currentPage * pageSize
     );
 
+    let data: any = []
+    for(const user of paginatedResult){
+      data.push({
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        address: user.address,
+        phoneNumber: user.phoneNumber,
+        role: user.roleId,
+        status: user.status
+      })
+    }
+
     // Return paginated response
     return {
-      users: paginatedResult,
+      users: data,
       total_result: totalRecords,
       current_page: currentPage,
       total_pages: totalPages,
@@ -275,6 +288,33 @@ class UserService {
     });
   }
   
+  async deactivateUserAccount(req: any) {
+    const id = req.params.id;
+  
+    // Find the user by ID
+    const user = await this.userRepo.findById(id);
+    if (!user) {
+      return { success: false, message: "User not found" };
+    }
+  
+    // Check if the user is already deactivated
+    if (user.status === 'inactive') {
+      return { success: false, message: "User account is already deactivated" };
+    }
+  
+    // Update the user status to 'inactive'
+    user.status = 'inactive';
+  
+    try {
+      // Update the user status to 'inactive'
+      const updatedUser = await this.userRepo.updateById(id, { status: 'inactive' });
+  
+      return { success: true, message: "User account deactivated successfully", data: updatedUser };
+    } catch (error) {
+      console.error("Error deactivating user:", error);
+      return { success: false, message: "Failed to deactivate user account" };
+    }
+  }
   
   
 }

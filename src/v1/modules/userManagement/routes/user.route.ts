@@ -22,8 +22,8 @@ router.get("/admin/fetch-users", (req: Request, res: Response) => {
   userController.getAll(req, res);
 });
 
-router.get("/admin/update-user/:id", (req: Request, res: Response) => {
-  userController.getAll(req, res);
+router.post("/admin/deactivate-user/:id", (req: Request, res: Response) => {
+  userController.deactiveUserAccount(req, res);
 });
 
 export default router;
