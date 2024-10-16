@@ -16,6 +16,7 @@ export class User extends Model {
   address?: string;
   idType!: string;
   idNumber!: string;
+  region!: string;
   roleId!: string;           // For role-based access control
   supervisorId?: string;
   status!: string;

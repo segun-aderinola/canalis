@@ -11,7 +11,7 @@ export type CreateUser = {
   idNumber: string;
   roleId: string;
   supervisorId?: string;
-  region?: string;
+  region: string;
   createdAt?: Date;
   updatedAt?: Date;
 };

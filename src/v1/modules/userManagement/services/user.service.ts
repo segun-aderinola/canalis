@@ -10,22 +10,38 @@ import { ErrorResponse, SuccessResponse } from "@shared/utils/response.util";
 import userAccountMail from "@shared/mailer/userAccountMail";
 import csvParser from "csv-parser";
 import fs from "fs";
+import IDVerificationService from "./id_verification.service";
 @injectable()
 class UserService {
-  constructor(private readonly userRepo: UserRepo, private readonly walletRepo: WalletRepo,) {}
+  constructor(
+    private readonly userRepo: UserRepo,
+    private readonly walletRepo: WalletRepo,
+    private readonly idVerificationService: IDVerificationService
+  ) {}
 
   async createUser(data: CreateUser, res) {
     // Check if a user with the provided email already exists
     const password = generateCode(5);
     data.password = password;
+  
     const existingUser = await this.userRepo.findOne({ email: data.email });
     if (existingUser) {
       res.send(ErrorResponse("User already exists with this email"))
     }
+    
+    // check if supervisor exist 
+    const existingSupervisor = await this.userRepo.findOne({ email: data.supervisorId });
+    if (!existingSupervisor) {
+      res.send(ErrorResponse("Supervisor does not exists."))
+    }
+
     // If the user doesn't exist, proceed with user creation
     const user = UserFactory.createUser(data);
     try {
       const createdUser = await this.userRepo.save(user);
+
+      // call ID verification service
+      const result = await this.idVerificationService.idVerification({ userId: createdUser.id, idNumber: data.idNumber, idType: data.idType }, res)
 
       // Create a wallet for the user after successfully creating the user
       //const wallet = await this.createWalletForUser(createdUser);

@@ -15,6 +15,7 @@ class UserFactory {
     user.supervisorId = data.supervisorId;
     user.password = data.password;
     user.address = data.address;
+    user.region = data.region;
     
   
     const allowedStatuses = ["active", "inactive", "deactivated"];
