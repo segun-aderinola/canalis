@@ -116,14 +116,6 @@ class UserService {
       filters.status = status;
     }
 
-    if (q) {
-      filters.$or = [
-        { name: { $like: `%${q}%` } },
-        { email: { $like: `%${q}%` } },
-        { phoneNumber: { $like: `%${q}%` } },
-      ];
-    }
-
     // Call the findWhere method for filtering and adding relations if needed
     const result = await this.userRepo.findWhere(filters);
 
