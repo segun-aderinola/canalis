@@ -7,40 +7,43 @@ import IDVerificationRepo from "../repositories/id_verification.repo";
 class IDVerificationService {
   constructor(private readonly idVerificationRepo: IDVerificationRepo) {}
 
-  async idVerification(data: {userId: string, idNumber: string, idType: string}, res) {    
-    
+  async idVerification(data: { userId: string; idNumber: string; idType: string }) {
     try {
-      // call a service here to verify the id
-      
+      // Simulate calling a third-party service to verify the ID
       const result = {
         userId: data.userId,
         issuingDate: "20-10-2009",
         expiringDate: "20-10-2029",
         idType: data.idType,
-        idNumber: data.idNumber
-      }
-      await this.logVerification(result, res)
-      
-    } catch (error: any) {
-      return res.status(500).json({ status: false, message: error.message })
-    }
-  }
-
-  async logVerification(data, res) {    
-    const user = IDVerificationFactory.idVerification(data);
-    try {
-      const logID = await this.idVerificationRepo.save(user);
-
+        idNumber: data.idNumber,
+      };
+  
+      // Log the verification result without passing 'res'
+      const logID = await this.logVerification(result);
+  
+      // Return the log ID or result for further use if needed
       return logID;
     } catch (error: any) {
-      return res.status(500).json({ status: false, message: error.message })
+      // Instead of returning res, throw an error for the controller to handle
+      throw new Error(`ID verification failed: ${error.message}`);
     }
   }
+  
 
-  async getAll() {
-    return await this.idVerificationRepo.getAll();
+  async logVerification(data) {
+    const user = IDVerificationFactory.idVerification(data);
+    try {
+      // Save the verification log to the repository
+      const logID = await this.idVerificationRepo.save(user);
+  
+      // Return log ID for use in other parts of the service/controller
+      return logID;
+    } catch (error: any) {
+      // Throw an error instead of handling HTTP response here
+      throw new Error(`Logging verification failed: ${error.message}`);
+    }
   }
-
 }
+  
 
 export default IDVerificationService;

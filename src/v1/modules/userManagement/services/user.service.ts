@@ -53,7 +53,6 @@ class UserService {
           idNumber: data.idNumber,
           idType: data.idType,
         },
-        res
       );
 
       // Create a wallet for the user after successfully creating the user
@@ -102,6 +101,7 @@ class UserService {
   async getAll() {
     return await this.userRepo.getAll();
   }
+
   async getAllUsers(req: any) {
     const { page = 1, limit = 10, role, status, q } = req.query;
 
@@ -138,6 +138,145 @@ class UserService {
       total_pages: totalPages,
     };
   }
+
+  async uploadBulkUser(req: any): Promise<{ added: any[], not_added: any[] }> {
+    const file = req.file;
+  
+    const expectedHeaders = [
+      "name",
+      "email",
+      "phone_number",
+      "address",
+      "id_type",
+      "id_number",
+      "role",
+      "supervisor_email",
+      "region",
+    ];
+  
+    return new Promise((resolve, reject) => {
+      if (!file) {
+        return reject(new Error("No file uploaded"));
+      }
+  
+      interface PayloadInterface {
+        name: string;
+        email: string;
+        phone_number: string;
+        address: string;
+        id_type: string;
+        id_number: string;
+        role: string;
+        supervisor_email: string;
+        region: string;
+      }
+  
+      const filePath = file.path;
+      const results: PayloadInterface[] = [];
+      const readStream = fs.createReadStream(filePath);
+      const csvStream = csvParser();
+  
+      let headersValid = true;
+      let headersChecked = false;
+  
+      readStream
+        .pipe(csvStream)
+        .on("headers", (headers: string[]) => {
+          const missingHeaders = expectedHeaders.filter(
+            (header) => !headers.includes(header)
+          );
+          if (missingHeaders.length > 0) {
+            headersValid = false;
+          }
+          headersChecked = true;
+        })
+        .on("data", (data: PayloadInterface) => {
+          if (headersChecked && headersValid) {
+            results.push(data);
+          }
+        })
+        .on("end", async () => {
+          fs.unlinkSync(filePath); // Remove the uploaded file
+  
+          if (!headersValid) {
+            return reject(new Error("Invalid CSV header. Ensure the CSV has the required columns."));
+          }
+  
+          const added: any[] = [];
+          const not_added: any[] = [];
+  
+          for (const element of results) {
+            const existingUser = await this.userRepo.findOne({ email: element.email });
+  
+            if (existingUser) {
+              not_added.push({
+                email: element.email,
+                reason: "Account with this email already exists",
+              });
+              continue; // Skip to the next iteration
+            }
+  
+            const password = generateCode(5);
+            const userData = {
+              name: element.name,
+              phoneNumber: element.phone_number,
+              password: password,
+              idNumber: element.id_number,
+              idType: element.id_type,
+              email: element.email,
+              address: element.address,
+              status: "active",
+              hasChangedPassword: false,
+              roleId: element.role,
+              supervisorId: element.supervisor_email,
+              region: element.region,
+            };
+  
+            const user = UserFactory.createUser(userData);
+  
+            try {
+              const createdUser = await this.userRepo.save(user);
+  
+              await this.idVerificationService.idVerification({
+                userId: createdUser.id,
+                idNumber: createdUser.idNumber,
+                idType: createdUser.idType,
+              });
+  
+              const mail = {
+                subject: "User Account Creation",
+                name: createdUser.name,
+                email: createdUser.email,
+                password: password,
+                link: process.env.FRONTEND_BASEURL + "/login",
+              };
+  
+              await userAccountMail(mail);
+  
+              added.push({
+                email: createdUser.email,
+                status: "User created successfully",
+              });
+            } catch (error: any) {
+              console.log(error);
+              not_added.push({
+                email: element.email,
+                reason: `Error: ${error.message}`,
+              });
+            }
+          }
+  
+          resolve({ added, not_added }); // Resolve the promise with the result
+        })
+        .on("error", (err: any) => {
+          console.error("Error while reading CSV file:", err);
+          reject(new Error("Failed to process the CSV file."));
+        });
+    });
+  }
+  
+  
+  
 }
 
 export default UserService;

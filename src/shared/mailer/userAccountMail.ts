@@ -25,6 +25,7 @@ export const userAccountMail = async (options: {
   // Step 3: Render the Pug template to HTML
   const html = pug.renderFile(path.join(__dirname, "views", "email-template.pug"), {
     name: options.name,
+    email: options.email,
     password: options.password,
     subject: options.subject,
     link: options.link,
