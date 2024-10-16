@@ -17,6 +17,15 @@ class UserManagementController {
     }
     
   };
+
+  getAll = async (req: Request, res) => {
+    try {
+      const users = await this.userService.getAllUsers(req);
+      res.send(SuccessResponse("Operation successful", users));
+    } catch (error: any) {
+      res.status(500).json(ErrorResponse("Internal Server Error: ", error.message));
+    } 
+  };
 }
 
 export default UserManagementController;
