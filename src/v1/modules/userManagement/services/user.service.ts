@@ -26,10 +26,9 @@ class UserService {
     const user = UserFactory.createUser(data);
     try {
       const createdUser = await this.userRepo.save(user);
-      // Create a wallet for the user after successfully creating the user
-      const wallet = await this.createWalletForUser(createdUser);
 
-      
+      // Create a wallet for the user after successfully creating the user
+      //const wallet = await this.createWalletForUser(createdUser);
 
       // send mail to user on account creaction success
       const mail = {
@@ -49,8 +48,7 @@ class UserService {
       }
 
       const returnData = {
-        user: createdUser,
-        wallet: wallet
+        user: createdUser
       }
       return returnData;
     } catch (error: any) {
@@ -65,10 +63,11 @@ class UserService {
       "email",
       "phone_number",
       "address",
-      "means_of_id",
+      "id_type",
+      "id_number",
       "role",
-      "supervisorId",
-      "regionId",
+      "supervisor",
+      "region",
     ];
     try {
       if (!req.file) {
@@ -80,7 +79,8 @@ class UserService {
         email: string;
         phone_number: string;
         address: string;
-        means_of_id: string;
+        id_type: string;
+        id_number: string;
         role: string;
         supervisor: string;
         region: string;
@@ -143,13 +143,15 @@ class UserService {
                 name: element.name,
                 phoneNumber: element.phone_number,
                 password: password,
-                meansOfId: element.means_of_id,
+                idType: element.id_type,
+                idNumber: element.id_number,
                 email: element.email,
                 address: element.address,
                 status: "active",
                 hasChangedPassword: false,
-                roleId: "",
-                supervisorId: ""
+                roleId: element.role,
+                supervisorId: element.supervisor,
+                region: element.region
               }
               
   

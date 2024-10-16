@@ -14,7 +14,8 @@ export class User extends Model {
   password!: string;
   phoneNumber!: string;
   address?: string;
-  meansOfId!: string;
+  idType!: string;
+  idNumber!: string;
   roleId!: string;           // For role-based access control
   supervisorId?: string;
   status!: string;
@@ -57,5 +58,4 @@ export class User extends Model {
   }
 }
 
-// Define the audit trail type
 export type IUser = ModelObject<User>;

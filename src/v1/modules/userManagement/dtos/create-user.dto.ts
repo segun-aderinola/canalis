@@ -7,9 +7,11 @@ export type CreateUser = {
   address: string;
   status: string;
   hasChangedPassword: boolean;
-  meansOfId: string;
+  idType: string;
+  idNumber: string;
   roleId: string;
   supervisorId?: string;
+  region?: string;
   createdAt?: Date;
   updatedAt?: Date;
 };
