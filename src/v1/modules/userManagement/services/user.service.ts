@@ -15,6 +15,7 @@ import fs from "fs";
 import IDVerificationService from "./id_verification.service";
 import { templateMail } from "@shared/mailer/template";
 import { userAccountMail } from "@shared/mailer/userAccountMail";
+import { userReactivationMail } from "@shared/mailer/userReactivationMail";
 @injectable()
 class UserService {
   constructor(
@@ -310,6 +311,51 @@ class UserService {
       const updatedUser = await this.userRepo.updateById(id, { status: 'inactive' });
   
       return { success: true, message: "User account deactivated successfully", data: updatedUser };
+    } catch (error) {
+      console.error("Error deactivating user:", error);
+      return { success: false, message: "Failed to deactivate user account" };
+    }
+  }
+
+  async reactivateUserAccount(req: any) {
+    const id = req.params.id;
+  
+    // Find the user by ID
+    const user = await this.userRepo.findById(id);
+    if (!user) {
+      return { success: false, message: "User not found" };
+    }
+  
+    // Check if the user is already deactivated
+    if (user.status === 'active') {
+      return { success: false, message: "User account is already activated" };
+    }
+  
+    // Update the user status to 'inactive'
+    const password = generateCode(5)
+    user.status = 'active';
+    user.hasChangedPassword = false;
+    user.password = password;
+    
+    // send reactivation email
+    const mail = {
+      subject: "Account Reactivated",
+      name: user.name,
+      email: user.email.toLowerCase(),
+      password: password,
+      link: process.env.FRONTEND_BASEURL + "/login",
+    };
+    try {
+      await userReactivationMail(mail);
+    } catch (error) {
+      console.log(error);
+    }
+  
+    try {
+      // Update the user status to 'inactive'
+      const updatedUser = await this.userRepo.updateById(id, { status: 'active' });
+  
+      return { success: true, message: "User account activated successfully", data: updatedUser };
     } catch (error) {
       console.error("Error deactivating user:", error);
       return { success: false, message: "Failed to deactivate user account" };

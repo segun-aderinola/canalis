@@ -15,7 +15,7 @@ const transporter = nodemailer.createTransport({
 });
 
 // Step 2: Create a function to send an email using Pug for rendering HTML content
-export const userAccountMail = async (options: {
+export const userReactivationMail = async (options: {
   email: string;
   subject: string;
   name: string;
@@ -23,7 +23,7 @@ export const userAccountMail = async (options: {
   link: string;
 }) => {
   // Step 3: Render the Pug template to HTML
-  const html = pug.renderFile(path.join(__dirname, "views", "user_account.pug"), {
+  const html = pug.renderFile(path.join(__dirname, "views", "reactivate-account.pug"), {
     name: options.name,
     email: options.email,
     password: options.password,

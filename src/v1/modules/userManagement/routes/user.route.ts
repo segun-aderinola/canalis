@@ -26,4 +26,8 @@ router.post("/admin/deactivate-user/:id", (req: Request, res: Response) => {
   userController.deactiveUserAccount(req, res);
 });
 
+router.post("/admin/reactivate-user/:id", (req: Request, res: Response) => {
+  userController.reactiveUserAccount(req, res);
+});
+
 export default router;

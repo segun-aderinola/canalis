@@ -47,6 +47,20 @@ class UserManagementController {
       return res.status(500).json({ status: false, message: "Failed to deactivate user account" });
     }
   };
+
+  reactiveUserAccount = async (req: Request, res: Response) => {
+    try {
+      const result = await this.userService.reactivateUserAccount(req);
+      if (result.success) {
+        return res.send(SuccessResponse(result.message, result.data));
+      } else {
+        return res.status(400).json({ status: result.success, message: result.message });
+      }
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ status: false, message: "Failed to deactivate user account" });
+    }
+  };
   
 }
 
