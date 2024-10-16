@@ -1,4 +1,4 @@
-import { SuccessResponse } from "@shared/utils/response.util";
+import { ErrorResponse, SuccessResponse } from "@shared/utils/response.util";
 import { Request } from "express";
 import { injectable } from "tsyringe";
 import UserService from "../services/user.service";
@@ -10,28 +10,17 @@ class UserManagementController {
   getAll = async (req: Request, res) => {
     try {
       const users = await this.userService.getAllUsers(req);
-      // if(users.)
       res.send(SuccessResponse("Operation successful", users));
     } catch (error: any) {
-      console.log(error)
-      // res.send(ErrorResponse("Operation successful", error));
+      res.status(500).json(ErrorResponse("Internal Server Error: ", error.message));
     } 
   };
   createUser = async(req: Request, res) => {
     try {
       const users: any  = await this.userService.createUser(req.body, res);
       res.send(SuccessResponse("Operation successful", users));
-    } catch (error) {
-      console.log(error)
-    }
-    
-  };
-  uploadBulkUser = async(req: Request, res) => {
-    try {
-      const users: any  = await this.userService.uploadBulkUser(res, req);
-      res.send(SuccessResponse("Operation successful", users));
-    } catch (error) {
-      console.log(error)
+    } catch (error: any) {
+      res.status(500).json(ErrorResponse("Internal Server Error: ", error.message));
     }
     
   };

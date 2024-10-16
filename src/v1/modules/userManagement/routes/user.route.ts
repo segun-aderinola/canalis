@@ -14,15 +14,8 @@ router.post("/admin/create-user", validate(createUserRules), (req: Request, res:
   userController.createUser(req, res);
 });
 
-router.post("/admin/upload-bulk-user", upload.single('users'), (req: Request, res: Response) => {
-  userController.uploadBulkUser(req, res);
-});
 
 router.get("/admin/fetch-users", (req: Request, res: Response) => {
-  userController.getAll(req, res);
-});
-
-router.get("/admin/update-user/:id", (req: Request, res: Response) => {
   userController.getAll(req, res);
 });
 
