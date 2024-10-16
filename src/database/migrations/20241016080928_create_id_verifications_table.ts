@@ -11,6 +11,8 @@ export async function up(knex: Knex): Promise<void> {
     table.date("expiringDate").notNullable();
 
     table.timestamps(true, true, true);
+
+    table.index("userId");
   });
 }
 

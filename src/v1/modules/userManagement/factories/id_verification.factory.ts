@@ -13,8 +13,6 @@ class IDVerificationFactory {
     idVerification.idType = data.idType;
     idVerification.idNumber = data.idNumber;
     
-    
-
     return idVerification;
   }
 }

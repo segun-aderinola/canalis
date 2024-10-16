@@ -11,6 +11,9 @@ export async function up(knex: Knex): Promise<void> {
     table.integer("status").notNullable().defaultTo(0);
 
     table.timestamps(true, true, true);
+
+    table.index("userId");
+
   });
 }
 
