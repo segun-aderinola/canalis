@@ -6,7 +6,7 @@ export async function up(knex: Knex): Promise<void> {
     table.uuid("id").primary().defaultTo(knex.raw("uuid_generate_v4()"));
     table.string("userId").notNullable();
     table.string("token").notNullable().unique();
-    table.date("expiringDate").notNullable();
+    table.date("expiringDatetime").notNullable();
     table.string("otpType").notNullable();
     table.integer("status").notNullable().defaultTo(0);
 
