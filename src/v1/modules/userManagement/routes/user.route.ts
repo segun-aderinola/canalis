@@ -14,13 +14,16 @@ router.post("/admin/create-user", validate(createUserRules), (req: Request, res:
   userController.createUser(req, res);
 });
 
+
 router.post("/admin/upload-bulk-user", upload.single('users'), (req: Request, res: Response) => {
   userController.uploadBulkUser(req, res);
 });
 
+
 router.get("/admin/fetch-users", (req: Request, res: Response) => {
   userController.getAll(req, res);
 });
+
 
 router.post("/admin/deactivate-user/:id", (req: Request, res: Response) => {
   userController.deactiveUserAccount(req, res);
@@ -28,6 +31,10 @@ router.post("/admin/deactivate-user/:id", (req: Request, res: Response) => {
 
 router.post("/admin/reactivate-user/:id", (req: Request, res: Response) => {
   userController.reactiveUserAccount(req, res);
+});
+
+router.get("/admin/export-users", (req: Request, res: Response) => {
+  userController.exportUserToCSV(req, res);
 });
 
 export default router;

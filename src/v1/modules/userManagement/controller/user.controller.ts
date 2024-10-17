@@ -7,14 +7,6 @@ import UserService from "../services/user.service";
 class UserManagementController {
   constructor(private readonly userService: UserService) {}
 
-  getAll = async (req: Request, res) => {
-    try {
-      const users = await this.userService.getAllUsers(req);
-      res.send(SuccessResponse("Operation successful", users));
-    } catch (error: any) {
-      res.status(500).json(ErrorResponse("Internal Server: ", error));
-    } 
-  };
   createUser = async(req: Request, res) => {
     try {
       const users: any  = await this.userService.createUser(req.body, res);
@@ -24,6 +16,7 @@ class UserManagementController {
     }
     
   };
+
   uploadBulkUser = async(req: Request, res: Response) => {
     try {
       const result: any  = await this.userService.uploadBulkUser(req);
@@ -59,6 +52,31 @@ class UserManagementController {
     } catch (error) {
       console.log(error);
       return res.status(500).json({ status: false, message: "Failed to deactivate user account" });
+    }
+  }
+
+  getAll = async (req: Request, res) => {
+    try {
+      const users = await this.userService.getAllUsers(req);
+      res.send(SuccessResponse("Operation successful", users));
+    } catch (error: any) {
+      res.status(500).json(ErrorResponse("Internal Server Error: ", error.message));
+    } 
+  };
+
+  exportUserToCSV = async (req: Request, res: Response) => {
+    try {
+      const { csvContent, fileName } = await this.userService.exportUser(req);
+      
+      res.setHeader("Content-Type", "text/csv");
+      res.setHeader(
+        "Content-Disposition",
+        `attachment; filename="${fileName}.csv"`
+      );
+  
+      res.send(csvContent);
+    } catch (error: any) {
+      res.status(500).json(ErrorResponse("Internal Server Error: ", error.message));
     }
   };
   

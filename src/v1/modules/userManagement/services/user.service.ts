@@ -6,6 +6,7 @@ import { IUser } from "../model/user.model";
 import UserRepo from "../repositories/user.repo";
 import WalletRepo from "../repositories/wallet.repo";
 import {
+  exportCSVData,
   generateCode,
   generateDummyAccountNumber,
 } from "@shared/utils/functions.util";
@@ -105,27 +106,27 @@ class UserService {
 
   async getAllUsers(req: any) {
     const { page = 1, limit = 10, role, status, q } = req.query;
-
+  
     // Define filters
     const filters: any = {};
-
+  
     if (role) {
       filters.roleId = role;
     }
-
+  
     if (status) {
       filters.status = status;
     }
-
+  
     // Call the findWhere method for filtering and adding relations if needed
     const result = await this.userRepo.findWhere(filters);
-
+  
     // Handle pagination
     const pageSize = parseInt(limit) || 10;
     const currentPage = parseInt(page) || 1;
     const totalRecords = result.length;
     const totalPages = Math.ceil(totalRecords / pageSize);
-
+  
     const paginatedResult = result.slice(
       (currentPage - 1) * pageSize,
       currentPage * pageSize
@@ -152,6 +153,7 @@ class UserService {
       total_pages: totalPages,
     };
   }
+
 
   async uploadBulkUser(req: any): Promise<{ added: any[], not_added: any[] }> {
     const file = req.file;
@@ -363,6 +365,64 @@ class UserService {
   }
   
   
+
+async exportUser(req: any) {
+  const { page = 1, limit = 10, role, status, q } = req.query;
+
+  // Define filters
+  const filters: any = {};
+
+  if (role) {
+    filters.roleId = role;
+  }
+
+  if (status) {
+    filters.status = status;
+  }
+
+  // Call the findWhere method for filtering and adding relations if needed
+  const result = await this.userRepo.findWhere(filters);
+
+  // Handle pagination
+  const pageSize = parseInt(limit) || 10;
+  const currentPage = parseInt(page) || 1;
+  const totalRecords = result.length;
+  const totalPages = Math.ceil(totalRecords / pageSize);
+
+  const paginatedResult = result.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  );
+
+  const all_users: any = [];
+
+  for (const user of paginatedResult) {
+    all_users.push({
+      name: user.name,
+      email: user.email,
+      phone_number: user.phoneNumber,
+      role: user.roleId,
+      status: user.status,
+    });
+  }
+
+  const csvHeader = [
+    { id: "name", title: "Name" },
+    { id: "email", title: "Email" },
+    { id: "phone_number", title: "Phone Number" },
+    { id: "role", title: "Role" },
+    { id: "status", title: "Status" },
+  ];
+
+  const csvContent = await exportCSVData("All_Users", csvHeader, all_users);
+
+  // Return the CSV content and file name to the controller
+  return {
+    csvContent,
+    fileName: "exported_users",
+  };
+}
+
 }
 
 export default UserService;

@@ -29,6 +29,7 @@ export const userAccountMail = async (options: {
     password: options.password,
     subject: options.subject,
     link: options.link,
+    email: options.email,
   });
 
   // Step 4: Create the email options
