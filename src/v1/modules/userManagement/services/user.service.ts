@@ -450,8 +450,14 @@ class UserService {
    const user = req.user;
     
     try {
-      await this.userRepo.updateById(user.userId, { avatar: req.body.avatar });
-
+      await this.userRepo.updateById(user.userId, {
+        name: req.body.name,
+        avatar: req.body.avatar,
+        phoneNumber: req.body.phoneNumber,
+        address: req.body.address,
+        roleId: req.body.roleId,
+        supervisorId: req.body.supervisorId
+      })
       return { success: true, message: "Your profile has been updated successfully" };
     } catch (error: any) {
       return { success: false, message: error.message };

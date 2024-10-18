@@ -4,7 +4,7 @@ import validate from "@shared/middlewares/validator.middleware";
 import multer from 'multer';
 import DashboardController from "../controller/dashboard.controller";
 import authMiddleware from "@shared/middlewares/auth.middleware";
-import { profileUpdateRules } from "../validations/password-reset.validator copy";
+import { profileUpdateRules } from "../validations/profile-update.validator";
 
 
 const dashboardController = container.resolve(DashboardController);
