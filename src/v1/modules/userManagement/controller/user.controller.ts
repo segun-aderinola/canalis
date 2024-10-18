@@ -17,6 +17,20 @@ class UserManagementController {
     
   };
 
+  updateUser = async(req: Request, res) => {
+    try {
+      const result: any  = await this.userService.updateUser(req);
+      if (result.success) {
+        return res.send(SuccessResponse(result.message));
+      } else {
+        return res.status(400).json({ status: result.success, message: result.message });
+      }
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ status: false, message: "Failed to update user account" });
+    }    
+  };
+
   uploadBulkUser = async(req: Request, res: Response) => {
     try {
       const result: any  = await this.userService.uploadBulkUser(req);

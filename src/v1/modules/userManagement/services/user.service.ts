@@ -14,7 +14,6 @@ import { ErrorResponse, SuccessResponse } from "@shared/utils/response.util";
 import csvParser from "csv-parser";
 import fs from "fs";
 import IDVerificationService from "./id_verification.service";
-import { templateMail } from "@shared/mailer/template";
 import { userAccountMail } from "@shared/mailer/userAccountMail";
 import { userReactivationMail } from "@shared/mailer/userReactivationMail";
 @injectable()
@@ -81,6 +80,33 @@ class UserService {
     } catch (error: any) {
       // return this.handleUserCreationError(user, error);
       return res.status(500).json({ status: false, message: error.message });
+    }
+  }
+
+  async updateUser(req) {
+    try {
+      const data = req.body
+      const user = await this.userRepo.findById(req.params.id);
+      if (!user) {
+        return { success: false, message: "User not found." }
+      }
+      const supervisor = await this.userRepo.findById(req.params.id);
+      if (!supervisor) {
+        return { success: false, message: "Supervisor does not exists with this email" }
+      }
+
+     await this.userRepo.updateById(req.params.id, {
+        name: data.name,
+        phoneNumber: data.phoneNumber,
+        address: data.address,
+        roleId: data.roleId,
+        supervisorId: data.supervisorId
+      })
+      return { success: true, message: "User data has been updated successfully" }
+
+    } catch (error: any) {
+      console.log(error)
+      return { status: false, message: error.message };
     }
   }
 
@@ -153,7 +179,6 @@ class UserService {
       total_pages: totalPages,
     };
   }
-
 
   async uploadBulkUser(req: any): Promise<{ added: any[], not_added: any[] }> {
     const file = req.file;
@@ -432,16 +457,17 @@ class UserService {
       return { success: false, message: error.message };
     }
   }
-async getProfile(req: any) {
-  const user = req.user;
-   try {
-   
-     const profile = await this.userRepo.findById(user.userId);
-     return profile;
-   } catch (error: any) {
-     return { success: false, message: error.message };
-   }
- }
+
+  async getProfile(req: any) {
+    const user = req.user;
+    try {
+    
+      const profile = await this.userRepo.findById(user.userId);
+      return profile;
+    } catch (error: any) {
+      return { success: false, message: error.message };
+    }
+  }
 }
 
 
