@@ -5,6 +5,7 @@ export type CreateUser = {
   phoneNumber: string;
   password: string;
   address: string;
+  avatar?: string;
   status: string;
   hasChangedPassword: boolean;
   idType: string;

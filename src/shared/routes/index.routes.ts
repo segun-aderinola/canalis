@@ -3,6 +3,7 @@ import appRoute from "../../v1/modules/app/app.route";
 import healthRoute from "../../v1/modules/health/health.route";
 import userRoute from "../../v1/modules/userManagement/routes/user.route";
 import authRoute from "../../v1/modules/userManagement/routes/auth.route";
+import dashboardRoute from "../../v1/modules/userManagement/routes/dashboard.route";
 
 
 export default {
@@ -11,4 +12,5 @@ export default {
   auditTrail: auditTrailRoute,
   userManagement: userRoute,
   auth: authRoute,
+  dashboard: dashboardRoute,
 };

@@ -14,6 +14,7 @@ export class User extends Model {
   password!: string;
   phoneNumber!: string;
   address?: string;
+  avatar?: string;
   idType!: string;
   idNumber!: string;
   region!: string;

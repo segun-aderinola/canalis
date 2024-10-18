@@ -364,65 +364,85 @@ class UserService {
     }
   }
   
-  
+  async exportUser(req: any) {
+    const { page = 1, limit = 10, role, status, q } = req.query;
 
-async exportUser(req: any) {
-  const { page = 1, limit = 10, role, status, q } = req.query;
+    // Define filters
+    const filters: any = {};
 
-  // Define filters
-  const filters: any = {};
+    if (role) {
+      filters.roleId = role;
+    }
 
-  if (role) {
-    filters.roleId = role;
+    if (status) {
+      filters.status = status;
+    }
+
+    // Call the findWhere method for filtering and adding relations if needed
+    const result = await this.userRepo.findWhere(filters);
+
+    // Handle pagination
+    const pageSize = parseInt(limit) || 10;
+    const currentPage = parseInt(page) || 1;
+    const totalRecords = result.length;
+    const totalPages = Math.ceil(totalRecords / pageSize);
+
+    const paginatedResult = result.slice(
+      (currentPage - 1) * pageSize,
+      currentPage * pageSize
+    );
+
+    const all_users: any = [];
+
+    for (const user of paginatedResult) {
+      all_users.push({
+        name: user.name,
+        email: user.email,
+        phone_number: user.phoneNumber,
+        role: user.roleId,
+        status: user.status,
+      });
+    }
+
+    const csvHeader = [
+      { id: "name", title: "Name" },
+      { id: "email", title: "Email" },
+      { id: "phone_number", title: "Phone Number" },
+      { id: "role", title: "Role" },
+      { id: "status", title: "Status" },
+    ];
+
+    const csvContent = await exportCSVData("All_Users", csvHeader, all_users);
+
+    // Return the CSV content and file name to the controller
+    return {
+      csvContent,
+      fileName: "exported_users",
+    };
   }
 
-  if (status) {
-    filters.status = status;
+  async updateProfile(req: any) {
+   const user = req.user;
+    
+    try {
+      await this.userRepo.updateById(user.userId, { avatar: req.body.avatar });
+
+      return { success: true, message: "Your profile has been updated successfully" };
+    } catch (error: any) {
+      return { success: false, message: error.message };
+    }
   }
-
-  // Call the findWhere method for filtering and adding relations if needed
-  const result = await this.userRepo.findWhere(filters);
-
-  // Handle pagination
-  const pageSize = parseInt(limit) || 10;
-  const currentPage = parseInt(page) || 1;
-  const totalRecords = result.length;
-  const totalPages = Math.ceil(totalRecords / pageSize);
-
-  const paginatedResult = result.slice(
-    (currentPage - 1) * pageSize,
-    currentPage * pageSize
-  );
-
-  const all_users: any = [];
-
-  for (const user of paginatedResult) {
-    all_users.push({
-      name: user.name,
-      email: user.email,
-      phone_number: user.phoneNumber,
-      role: user.roleId,
-      status: user.status,
-    });
-  }
-
-  const csvHeader = [
-    { id: "name", title: "Name" },
-    { id: "email", title: "Email" },
-    { id: "phone_number", title: "Phone Number" },
-    { id: "role", title: "Role" },
-    { id: "status", title: "Status" },
-  ];
-
-  const csvContent = await exportCSVData("All_Users", csvHeader, all_users);
-
-  // Return the CSV content and file name to the controller
-  return {
-    csvContent,
-    fileName: "exported_users",
-  };
+async getProfile(req: any) {
+  const user = req.user;
+   try {
+   
+     const profile = await this.userRepo.findById(user.userId);
+     return profile;
+   } catch (error: any) {
+     return { success: false, message: error.message };
+   }
+ }
 }
 
-}
 
 export default UserService;

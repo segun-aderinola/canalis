@@ -37,6 +37,7 @@ class App {
     this.app.use(RouteVersion.v1, routes.auditTrail);
     this.app.use(RouteVersion.v1, routes.userManagement);
     this.app.use(RouteVersion.v1, routes.auth);
+    this.app.use(RouteVersion.v1, routes.dashboard);
   }
 
   public getInstance() {
