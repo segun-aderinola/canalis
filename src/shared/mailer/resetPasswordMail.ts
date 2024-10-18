@@ -1,8 +1,11 @@
 import nodemailer from "nodemailer";
-import hbs from "nodemailer-express-handlebars";
-import dotenv from "dotenv"
+import pug from "pug";
+import path from "path";
+import dotenv from "dotenv";
+
 dotenv.config();
 
+// Step 1: Configure your transporter with SMTP options (e.g., Gmail, etc.)
 const transporter = nodemailer.createTransport({
   service: process.env.MAIL_SERVICE,
   auth: {
@@ -11,33 +14,29 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-const option = {
-  viewEngine: {
-    extname: ".hbs", // handlebars extension
-    layoutsDir: __dirname + "/views/", // location of handlebars templates
-    defaultLayout: "password_reset", // name of main template
-  },
-  viewPath: __dirname + "/views/",
-  extName: ".hbs",
-};
+// Step 2: Create a function to send an email using Pug for rendering HTML content
+export const resetPasswordMail = async (options: {
+  email: string;
+  subject: string;
+  name: string;
+  otp: string;
+}) => {
+  // Step 3: Render the Pug template to HTML
+  const html = pug.renderFile(path.join(__dirname, "views", "password_reset.pug"), {
+    name: options.name,
+    email: options.email,
+    otp: options.otp,
+    subject: options.subject,
+  });
 
-const send = async (options:any) => {
-  await transporter.use("compile", hbs(option));
-
-  const message = {
+  // Step 4: Create the email options
+  const mailOptions = {
     from: `${process.env.FROM_NAME} <${process.env.FROM_EMAIL}>`,
-    to: [options.email],
-    subject: `${options.subject}`,
-    template: "password_reset",
-    context: {
-      name: `${options.name}`,
-      otp: `${options.otp}`,
-    },
+    to: options.email,
+    subject: options.subject,
+    html, // Pug-rendered HTML content
   };
 
-  const info = await transporter.sendMail(message);
-  //console.log(info.messageId);
-  return info;
+  // Step 5: Send the email using Nodemailer
+  return transporter.sendMail(mailOptions);
 };
-
-export default { send };

@@ -36,6 +36,7 @@ class App {
     this.app.use(routes.health); // Register health check routes
     this.app.use(RouteVersion.v1, routes.auditTrail);
     this.app.use(RouteVersion.v1, routes.userManagement);
+    this.app.use(RouteVersion.v1, routes.auth);
   }
 
   public getInstance() {

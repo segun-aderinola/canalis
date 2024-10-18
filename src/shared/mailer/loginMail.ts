@@ -1,45 +1,38 @@
 import nodemailer from "nodemailer";
-import hbs from "nodemailer-express-handlebars";
-import dotenv from "dotenv"
+import pug from "pug";
+import path from "path";
+import dotenv from "dotenv";
+
 dotenv.config();
 
-var transporter = nodemailer.createTransport({
-  service:  process.env.MAIL_SERVICE,
+// Step 1: Configure your transporter with SMTP options (e.g., Gmail, etc.)
+const transporter = nodemailer.createTransport({
+  service: process.env.MAIL_SERVICE,
   auth: {
-    user:  process.env.MAIL_USERNAME,
-    pass:  process.env.MAIL_PASSWORD
+    user: process.env.MAIL_USERNAME,
+    pass: process.env.MAIL_PASSWORD,
   },
 });
 
-var option = {
-    viewEngine : {
-        extname: '.hbs', // handlebars extension
-        layoutsDir: __dirname+'/views/', // location of handlebars templates
-        defaultLayout: 'login_mail', // name of main template
-    },
-    viewPath: __dirname+'/views/',
-    extName: '.hbs'
+// Step 2: Create a function to send an email using Pug for rendering HTML content
+export const loginMail = async (options: {
+  email: string;
+  subject: string;
+  name: string;
+}) => {
+  // Step 3: Render the Pug template to HTML
+  const html = pug.renderFile(path.join(__dirname, "views", "login.pug"), {
+    name: options.name
+  });
+
+  // Step 4: Create the email options
+  const mailOptions = {
+    from: `${process.env.FROM_NAME} <${process.env.FROM_EMAIL}>`,
+    to: options.email,
+    subject: options.subject,
+    html, // Pug-rendered HTML content
+  };
+
+  // Step 5: Send the email using Nodemailer
+  return transporter.sendMail(mailOptions);
 };
-
-const send = async (options:any) => {
-
-    await transporter.use('compile', hbs(option));
-
-    const message = {
-      from: `${process.env.FROM_NAME} <${process.env.FROM_EMAIL}>`,
-      to: `${options.email}`,
-      subject: `${options.subject}`,
-      template: 'login_mail',
-      context: {
-        name: `${options.name}`
-      }
-    };
-  
-    const info = await transporter.sendMail(message);
-    //console.log(info);
-    return info;
-}
-
-export default { send };
-
-
