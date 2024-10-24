@@ -19,7 +19,8 @@
     "strict": true,
     "resolveJsonModule": true,
     "newLine": "lf",
-    "noUnusedLocals": true,
+    "noUnusedLocals": true,   // Disable errors for unused local variables
+    "noUnusedParameters": true, // Disable errors for unused parameters
     "noFallthroughCasesInSwitch": true,
     "useDefineForClassFields": true,
     "forceConsistentCasingInFileNames": true,
@@ -35,5 +36,4 @@
   },
   "include": ["src/**/*.ts", "src/**/*.json"],
   "exclude": ["node_modules", "**/*.spec.ts", "**/*.test.ts"],
-  
 }

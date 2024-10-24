@@ -1,0 +1,22 @@
+import { Knex } from "knex";
+import { DB_TABLES } from "../../shared/enums/db-tables.enum";
+
+export async function up(knex: Knex): Promise<void> {
+	return knex.schema.createTable(
+		DB_TABLES.PERMISSIONS,
+		(table: Knex.TableBuilder) => {
+			table.uuid("id").primary().defaultTo(knex.raw("uuid_generate_v4()"));
+      table.uuid("moduleId").notNullable().references("id").inTable(DB_TABLES.MODULES);
+			table.string("name").notNullable().unique();
+      table.string("description").notNullable();
+      table.string("action").notNullable();
+			table.string("slug").notNullable().unique();
+			table.timestamps(true, true, true);
+      table.index("moduleId");
+		}
+	);
+}
+
+export async function down(knex: Knex): Promise<void> {
+	return knex.schema.dropTable(DB_TABLES.PERMISSIONS);
+}
