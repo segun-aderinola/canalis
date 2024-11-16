@@ -3,12 +3,11 @@ import pug from "pug";
 import path from "path";
 import logger from "@shared/utils/logger";
 
-
 class MailService {
   private transporter: Transporter;
 
   constructor() {
-    
+
     this.transporter = nodemailer.createTransport({
       service: process.env.MAIL_SERVICE,
       auth: {
@@ -18,13 +17,12 @@ class MailService {
     });
   }
 
-
   async sendLoginEmail(options: any): Promise<void> {
     const data = { name: options.name }
     try {
         await this.sendMail(data, options, "login");
     } catch (error: any) {
-        logger.error({error: error.message}, "Error sending mail");
+      logger.error({ error: error.message }, "Error sending email")
     }
   }
 
@@ -37,7 +35,7 @@ class MailService {
     try {
         await this.sendMail(data, options, "user_account");
     } catch (error: any) {
-        logger.error({error: error.message}, "Error sending mail");
+        logger.error({ error: error.message }, "Error sending mail")
     }
   }
 
@@ -52,7 +50,7 @@ class MailService {
     try {
         await this.sendMail(data, options, "reactivate-account");
     } catch (error: any) {
-        logger.error({error: error.message}, "Error sending mail");
+      logger.error({ error: error.message }, "Error sending mail");
     }
   }
 
@@ -66,11 +64,13 @@ class MailService {
     try {
         await this.sendMail(data, options, "otp");
     } catch (error: any) {
-        logger.error({error: error.message}, "Failed to send OTP");   
+      logger.error({ error: error.message }, "Error sending mail")
     }
-  }
 
+  }
   
+
+
   private async sendMail(data: any, options: any, template: any): Promise<void> {
     const html = this.renderTemplate(`${template}.pug`, data);
 

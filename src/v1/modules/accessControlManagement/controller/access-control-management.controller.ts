@@ -42,7 +42,7 @@ class AccessControlManagementController {
 			.send(SuccessResponse("Role fetched successfully", role));
 	};
 
-	getAllRoles = async (req: Request, res: Response) => {
+	getAllRoles = async (_req: Request, res: Response) => {
 		const roles: any = await this.accessControlManagementService.getAllRoles();
 
 		return res
@@ -63,7 +63,7 @@ class AccessControlManagementController {
 		return res.status(httpStatus.OK).send(SuccessResponse("Permission fetched successful", permission));
 	};
 
-	getAllPermissions = async (req: Request, res: Response) => {
+	getAllPermissions = async (_req: Request, res: Response) => {
 		const permissions: any =
 			await this.accessControlManagementService.getAllPermissions();
 

@@ -1,5 +1,4 @@
 import { SuccessResponse } from "@shared/utils/response.util";
-import { Request } from "express";
 import { injectable } from "tsyringe";
 import AuditTrailService from "../services/audit-trail.service";
 
@@ -7,7 +6,7 @@ import AuditTrailService from "../services/audit-trail.service";
 class AuditTrailController {
   constructor(private readonly auditTrailService: AuditTrailService) {}
 
-  getAll = async (req: Request, res) => {
+  getAll = async (res) => {
     const auditTrails = await this.auditTrailService.getAll();
 
     res.send(SuccessResponse("Operation successful", auditTrails));

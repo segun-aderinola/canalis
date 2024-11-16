@@ -1,8 +1,8 @@
 import { DB_TABLES } from "@shared/enums/db-tables.enum";
-// import { ObjectLiteral } from "@shared/types/object-literal.type";
 import { Model, ModelObject } from "objection";
 import bcrypt from "bcrypt";
-// import { Role } from "./Role";  // Import Role model
+import { Role } from "../../accessControlManagement/model/role.model";
+
 
 const SALT_ROUNDS = 10;
 
@@ -21,16 +21,16 @@ export class User extends Model {
   status!: string;
   isDefaultPassword!: boolean;
   
-  // static relationMappings = {
-  //   role: {
-  //     relation: Model.BelongsToOneRelation,
-  //     modelClass: Role,
-  //     join: {
-  //       from: 'users.roleId',
-  //       to: 'roles.id',
-  //     },
-  //   },
-  // };
+  static relationMappings = {
+    role: {
+      relation: Model.BelongsToOneRelation,
+      modelClass: Role,
+      join: {
+        from: 'users.roleId',
+        to: 'roles.id',
+      },
+    },
+  };
 
   async $beforeInsert(): Promise<void> {
     if (this.password) {

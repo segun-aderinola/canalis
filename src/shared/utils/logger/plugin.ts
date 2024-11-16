@@ -14,7 +14,7 @@ function logRequest(req, res, next) {
   next();
 }
 
-function addPayloadToResponse(req, res, next) {
+function addPayloadToResponse(res, next) {
   // Middleware to handle payload processing before sending the response
   const originalSend = res.send;
   res.send = function (body) {

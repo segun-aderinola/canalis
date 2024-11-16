@@ -1,0 +1,33 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: agency-base-config
+  namespace: dev
+data:
+  APP_NAME: Agency base service
+  APP_HOME: 127.0.0.1
+  PORT: "8080"
+  DB_CLIENT: postgres
+  DB_HOST: 101.10.10.30
+  DB_PORT: "5432"
+  REDIS_HOST: redis-service.dev.svc.cluster.local
+  REDIS_PORT: "6379"
+  DB_DATABASE: insurance_agency_base_mgt
+  REDIS_USERNAME: default
+ 
+ 
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: agency-base-secret
+  namespace: dev
+type: Opaque
+data:
+  # REDIS_PASSWORD: cjFHTmhsbmR5VE5UMU41bA==
+  # REDIS_USERNAME: Y2FuYWxpcy1yZWRpcy1kZXY=
+  DB_PASSWORD: OUo3Wkh2Y2h1MWhzS3JsOA==
+  DB_USERNAME: Y2FuYWxpc3VzZXI=
+

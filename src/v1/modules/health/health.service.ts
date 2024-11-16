@@ -1,5 +1,5 @@
 import RedisClient from "@shared/redis-client/redis-client";
-import { Request, Response } from "express";
+import { Response } from "express";
 import httpStatus from "http-status";
 import Redis from "ioredis";
 import { injectable } from "tsyringe";
@@ -13,7 +13,7 @@ class HealthService {
     this.redisClient = redisClient.get();
   }
 
-  async readinessCheck(req: Request, reply: Response) {
+  async readinessCheck(reply: Response) {
     const postgresHealth = await this.checkPostgresHealth();
     const redisHealth = await this.checkRedisHealth();
 
@@ -30,7 +30,7 @@ class HealthService {
     }
   }
 
-  livelinessCheck(req: Request, reply: Response) {
+  livelinessCheck(reply: Response) {
     reply.status(httpStatus.OK).send({
       status: "UP",
     });

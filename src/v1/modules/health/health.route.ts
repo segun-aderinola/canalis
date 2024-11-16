@@ -1,16 +1,16 @@
-import express, { Request, Response } from "express";
+import express, { Response } from "express";
 import { container } from "tsyringe";
 import HealthController from "./health.controller";
 
 const healthController = container.resolve(HealthController);
 const router = express.Router();
 
-router.get("/readyz", (req: Request, res: Response) => {
-  healthController.readinessCheck(req, res);
+router.get("/readyz", (res: Response) => {
+  healthController.readinessCheck(res);
 });
 
-router.get("/livez", (req: Request, res: Response) => {
-  healthController.livelinessCheck(req, res);
+router.get("/livez", (res: Response) => {
+  healthController.livelinessCheck(res);
 });
 
 export default router;

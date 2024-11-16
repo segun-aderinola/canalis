@@ -76,4 +76,32 @@ export class BaseRepository<T, M extends Model> {
 
     return await query.where(filter);
   }
+
+  async findOrWhere(
+    filter: ObjectLiteral, 
+    orFilter?: ObjectLiteral, 
+    andFilter?: ObjectLiteral
+  ): Promise<T | undefined> {
+    const query = this.model.query();
+  
+    query.where(filter);
+  
+    if (orFilter) {
+      for (const key in orFilter) {
+        if (Object.prototype.hasOwnProperty.call(orFilter, key)) {
+          query.orWhere(key, orFilter[key]);
+        }
+      }
+    }
+  
+    if (andFilter) {
+      for (const key in andFilter) {
+        if (Object.prototype.hasOwnProperty.call(andFilter, key)) {
+          query.andWhere(key, andFilter[key]);
+        }
+      }
+    }
+  
+    return await query.first();
+  }
 }

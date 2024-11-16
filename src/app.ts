@@ -8,13 +8,22 @@ import bootstrapApp from "./bootstrap";
 import RouteVersion from "@config/route.config";
 import routes from "./shared/routes/index.routes";
 import logger from "@shared/utils/logger";
-
 class App {
+  // use(arg0: any) {
+  //   throw new Error("Method not implemented.");
+  // }
   private app: express.Application;
   private server: http.Server;
 
+  
+
   constructor() {
     this.app = express();
+
+    this.app.use(express.json());
+    this.app.use(express.json({ limit: '100mb' }));
+    this.app.use(express.urlencoded({ limit: '100mb', extended: true }));
+
     bootstrapApp(this.app);
 
     this.registerModules();
@@ -26,6 +35,7 @@ class App {
     this.app.use(routes.app); // Register your main app routes
     this.app.use(routes.health); // Register health check routes
     this.app.use(RouteVersion.v1, routes.auditTrail);
+    this.app.use(RouteVersion.v1, routes.userManagement);
   }
 
   public getInstance() {
