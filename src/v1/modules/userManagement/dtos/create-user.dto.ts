@@ -7,10 +7,12 @@ export type CreateUser = {
   address: string;
   avatar?: string;
   status?: string;
-  isDefaultPassword: boolean;
-  idType: string;
-  idNumber: string;
+  isDefaultPassword?: boolean;
+  idType?: string;
+  idNumber?: string;
   roleId: string;
-  supervisorId: string;
+  supervisorId?: string;
   region: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 };

@@ -77,4 +77,3 @@ function setErrorHandler(app: express.Application) {
 }
 
 export default bootstrapApp;
-

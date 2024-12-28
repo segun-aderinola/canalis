@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: emple-agency-base-service
+  namespace: staging
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: emple-agency-base-service
+  template:
+    metadata:
+      labels:
+        app: emple-agency-base-service
+    spec:
+      containers:
+        - name: emple-agency-base-service
+          image: REGISTRY/PROJECT_ID/IMAGE
+          ports:
+            - name: http
+              containerPort: 8080
+          resources:
+            requests:
+              cpu: 100m
+            limits:
+              cpu: 300m
+          envFrom:
+            - configMapRef:
+                name: agency-base-config
+            - secretRef:
+                name: agency-base-secret
+            - secretRef:
+                name: database-redis-secret
+
+      imagePullSecrets:
+        - name: acr-secret

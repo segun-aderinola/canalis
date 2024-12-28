@@ -1,4 +1,3 @@
-// import { ObjectLiteral } from "@shared/types/object-literal.type";
 import { IdVerification } from "../dtos/create-id-verification.dto";
 import { IDV } from "../model/id_verification.model";
 

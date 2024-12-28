@@ -7,7 +7,7 @@ class MailService {
   private transporter: Transporter;
 
   constructor() {
-
+    
     this.transporter = nodemailer.createTransport({
       service: process.env.MAIL_SERVICE,
       auth: {
@@ -22,7 +22,7 @@ class MailService {
     try {
         await this.sendMail(data, options, "login");
     } catch (error: any) {
-      logger.error({ error: error.message }, "Error sending email")
+        logger.error({error: error.message}, "Error sending mail");
     }
   }
 
@@ -35,10 +35,9 @@ class MailService {
     try {
         await this.sendMail(data, options, "user_account");
     } catch (error: any) {
-        logger.error({ error: error.message }, "Error sending mail")
+        logger.error({error: error.message}, "Error sending mail");
     }
   }
-
   async sendAccountReactivationMail(options: any): Promise<void> {
     const data = {
         name: options.name,
@@ -50,10 +49,28 @@ class MailService {
     try {
         await this.sendMail(data, options, "reactivate-account");
     } catch (error: any) {
-      logger.error({ error: error.message }, "Error sending mail");
+        logger.error({error: error.message}, "Error sending mail");
     }
   }
 
+  async sendBulkUserAccountMail(optionsList: any[]): Promise<void> {
+    try {
+      const promises = optionsList.map(options => {
+        const data = {
+          name: options.name,
+          email: options.email,
+          password: options.password,
+          subject: options.subject,
+          link: options.link,
+        };
+        return this.sendMail(data, options, "user_account");
+      });
+      await Promise.all(promises);
+    } catch (error: any) {
+      logger.error({ error: error.message }, "Error sending bulk emails");
+    }
+  }
+  
   async sendOTPMail(options: any): Promise<void> {
     const data = {
         name: options.name,
@@ -64,13 +81,11 @@ class MailService {
     try {
         await this.sendMail(data, options, "otp");
     } catch (error: any) {
-      logger.error({ error: error.message }, "Error sending mail")
+        logger.error({error: error.message}, "Failed to send OTP");   
     }
 
   }
   
-
-
   private async sendMail(data: any, options: any, template: any): Promise<void> {
     const html = this.renderTemplate(`${template}.pug`, data);
 

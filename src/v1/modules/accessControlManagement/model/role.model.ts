@@ -19,7 +19,7 @@ export class Role extends Model {
 			join: {
 				from: "roles.id",
 				through: {
-					from: "role_permissions.roleId", // Join table for Many-to-Many relation
+					from: "role_permissions.roleId",
 					to: "role_permissions.permissionId",
 				},
 				to: "permissions.id",

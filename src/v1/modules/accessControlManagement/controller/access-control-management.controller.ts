@@ -1,8 +1,8 @@
 import httpStatus from "http-status";
-import { SuccessResponse } from "@shared/utils/response.util";
 import { Request, Response } from "express";
 import { injectable } from "tsyringe";
 import AccessControlManagementService from "../services/access-control-management.service";
+import { SuccessResponse } from "@shared/utils/response.util";
 
 @injectable()
 class AccessControlManagementController {
@@ -11,65 +11,64 @@ class AccessControlManagementController {
 	) {}
 
 	createRole = async (req: Request, res: Response) => {
-		const role: any = await this.accessControlManagementService.createRole(
-			req.body,
-			res
+		const response = await this.accessControlManagementService.createRole(
+			req.body
 		);
 
 		return res
 			.status(httpStatus.CREATED)
-			.send(SuccessResponse("Role created successfully", role));
+			.send(SuccessResponse("Operation successful", response));
 	};
 
 	updateRole = async (req: Request, res: Response) => {
-		const role: any = await this.accessControlManagementService.updateRole(
+		const response = await this.accessControlManagementService.updateRole(
 			req.params.id,
-			req.body,
-			res
+			req.body
 		);
 
-		return res.status(httpStatus.OK).send(SuccessResponse("Role updated successfully", role));
+		return res
+			.status(httpStatus.OK)
+			.send(SuccessResponse("Operation successful", response));
 	};
 
 	getRole = async (req: Request, res: Response) => {
-		const role: any = await this.accessControlManagementService.getRole(
-			req.params.id,
-			res
+		const response = await this.accessControlManagementService.getRole(
+			req.params.id
 		);
 
 		return res
 			.status(httpStatus.OK)
-			.send(SuccessResponse("Role fetched successfully", role));
+			.send(SuccessResponse("Operation successful", response));
 	};
 
-	getAllRoles = async (_req: Request, res: Response) => {
-		const roles: any = await this.accessControlManagementService.getAllRoles();
+	getAllRoles = async (res: Response) => {
+		const response = await this.accessControlManagementService.getAllRoles();
 
-		return res
-			.status(httpStatus.OK)
-			.send(SuccessResponse("Role fetched successfully", roles));
+		return res.status(httpStatus.OK).send(response);
 	};
 
 	deleteRole = async (req: Request, res: Response) => {
-		await this.accessControlManagementService.deleteRole(req.params.id, res);
+		await this.accessControlManagementService.deleteRole(
+			req.params.id
+		);
 
-		return res.status(httpStatus.NO_CONTENT).send(SuccessResponse("Role deleted successfully"));
+		return res
+			.status(httpStatus.NO_CONTENT)
+			.send(SuccessResponse("Operation successful"));
 	};
 
 	getPermission = async (req: Request, res: Response) => {
-		const permission: any =
-			await this.accessControlManagementService.getPermission(req.params.id, res);
+		const response =
+			await this.accessControlManagementService.getPermission(req.params.id);
 
-		return res.status(httpStatus.OK).send(SuccessResponse("Permission fetched successful", permission));
+			return res.status(httpStatus.OK).send(SuccessResponse("Operation successful", response));
 	};
 
-	getAllPermissions = async (_req: Request, res: Response) => {
-		const permissions: any =
+	getAllPermissions = async (res: Response) => {
+		const response =
 			await this.accessControlManagementService.getAllPermissions();
 
-		return res
-			.status(httpStatus.OK)
-			.send(SuccessResponse("Permissions fetched successful", permissions));
+		return res.status(httpStatus.OK).send(SuccessResponse("Operation successful", response));
 	};
 }
 

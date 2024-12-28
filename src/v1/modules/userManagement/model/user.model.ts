@@ -3,7 +3,6 @@ import { Model, ModelObject } from "objection";
 import bcrypt from "bcrypt";
 import { Role } from "../../accessControlManagement/model/role.model";
 
-
 const SALT_ROUNDS = 10;
 
 export class User extends Model {
@@ -16,7 +15,7 @@ export class User extends Model {
   address?: string;
   avatar?: string;
   region!: string;
-  roleId!: string;           // For role-based access control
+  roleId!: string;
   supervisorId?: string;
   status!: string;
   isDefaultPassword!: boolean;

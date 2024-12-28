@@ -193,7 +193,7 @@ export class BaseRepository<T, M extends Model> {
 				await this.model.query(transaction).deleteById(id);
 			});
 		} catch (error: any) {
-			console.error("Error during deletion:", error);
+			logger.error("Error during deletion:", error);
 			throw new ServiceUnavailableError(
 				"Failed to delete role with its relations."
 			);

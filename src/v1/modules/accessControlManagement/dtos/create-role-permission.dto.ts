@@ -1,4 +1,4 @@
 export type CreateRolePermission = {
   roleId?: string;
-  permissionId: string;
+  permissions: string[];
 };

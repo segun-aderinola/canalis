@@ -1,4 +1,3 @@
-// import { ObjectLiteral } from "@shared/types/object-literal.type";
 import { CreateUser } from "../dtos/create-user.dto";
 import { IUser } from "../model/user.model";
 
@@ -14,7 +13,9 @@ class UserFactory {
     user.password = data.password;
     user.address = data.address;
     user.region = data.region;
-        
+
+
+     
     return user;
   }
 }

@@ -8,6 +8,12 @@ import bootstrapApp from "./bootstrap";
 import RouteVersion from "@config/route.config";
 import routes from "./shared/routes/index.routes";
 import logger from "@shared/utils/logger";
+import { BullAdapter } from 'bull-board/bullAdapter';
+import { createBullBoard } from 'bull-board';
+import walletCreationQueue from "./v1/modules/userManagement/queues/wallet-creation.queue";
+
+
+
 class App {
   // use(arg0: any) {
   //   throw new Error("Method not implemented.");
@@ -27,15 +33,25 @@ class App {
     bootstrapApp(this.app);
 
     this.registerModules();
+    this.registerBullBoard();
 
     this.server = http.createServer(this.app);
   }
 
   private registerModules() {
-    this.app.use(routes.app); // Register your main app routes
-    this.app.use(routes.health); // Register health check routes
+    this.app.use(routes.app);
+    this.app.use(routes.health);
     this.app.use(RouteVersion.v1, routes.auditTrail);
+    this.app.use(RouteVersion.v1, routes.auth);
     this.app.use(RouteVersion.v1, routes.userManagement);
+  }
+
+  private registerBullBoard() {
+    const { router } = createBullBoard([
+      new BullAdapter(walletCreationQueue),
+    ]);
+
+    this.app.use('/admin/queues', router);
   }
 
   public getInstance() {

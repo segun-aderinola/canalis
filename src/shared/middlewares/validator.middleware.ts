@@ -8,10 +8,10 @@ type Error = {
   message: string;
 };
 
-const validate = (rules: ObjectLiteral, validationMessages?: ObjectLiteral) => {
+export const validate = (rules: ObjectLiteral, validationMessages?: ObjectLiteral) => {
   return (request: Request, reply: Response, done) => {
-    const source = { ...request.body, ...request.query, ...request.params};
-    const validation = new Validator(source, rules, validationMessages);
+    const validation = new Validator(request.body || request.query, rules, validationMessages);
+
     const errors = validation.errors.all();
 
     if (validation.fails()) {
@@ -21,6 +21,41 @@ const validate = (rules: ObjectLiteral, validationMessages?: ObjectLiteral) => {
     done();
   };
 };
+
+export const validateArray = (rulesArray: Array<ObjectLiteral>, validationMessages?: ObjectLiteral) => {
+  return (request: Request, reply: Response, done: Function) => {
+    const requestData = request.body || request.query;
+
+    if (!Array.isArray(requestData)) {
+      return reply.status(400).send(ErrorResponse("Payload should be an array", []));
+    }
+
+    
+    let validationFailed = false;
+    let allErrors: any = [];
+
+    requestData.forEach((data: any, index: number) => {
+      const validation = new Validator(data, rulesArray[0], validationMessages); 
+      const errors = validation.errors.all();
+
+      if (validation.fails()) {
+        validationFailed = true;
+        const formattedErrors = Object.keys(errors).map((field) => ({
+          field: `Item ${index} - ${field}`, 
+          messages: errors[field],
+        }));
+        allErrors.push(...formattedErrors);
+      }
+    });
+
+    if (validationFailed) {
+      return reply.status(400).send(ErrorResponse("Your data is invalid", allErrors));
+    }
+    done();
+  };
+};
+
+
 
 export const createValidationError = (validationError: []) => {
   const errors: Error[] = [];
@@ -34,5 +69,3 @@ export const createValidationError = (validationError: []) => {
 
   return errors;
 };
-
-export default validate;

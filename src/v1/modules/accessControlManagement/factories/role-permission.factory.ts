@@ -1,13 +1,26 @@
-// import { ObjectLiteral } from "@shared/types/object-literal.type";
 import { CreateRolePermission } from "../dtos/create-role-permission.dto";
-import { IRolePermission } from "../model/role-permission.model";
+import PermissionFactory from "./permission.factory";
+import RoleFactory from "./role.factory";
 
 class RolePermissionFactory {
-	static createRolePermission(data: CreateRolePermission) {
-		const rolePermission = {} as IRolePermission;
+	static createRolePermissionDto(data: CreateRolePermission) {
+		const rolePermission = {} as any;
 
-		rolePermission.roleId = data.roleId ?? "";
-		rolePermission.permissionId = data.permissionId;
+		rolePermission.permissions = data.permissions.map((permission) => ({
+				permissionId: permission,
+			}));
+
+		return rolePermission;
+	}
+
+	static readRolePermissionDto(data: any) {
+		const rolePermission = {} as any;
+
+		rolePermission.role = RoleFactory.readRolesDto(data);
+
+		rolePermission.role.forEach(role => {
+			role.permissions = PermissionFactory.readPermissionsDto(role.permissions);
+		});
 
 		return rolePermission;
 	}

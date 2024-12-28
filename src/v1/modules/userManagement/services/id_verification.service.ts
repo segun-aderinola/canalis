@@ -8,7 +8,6 @@ class IDVerificationService {
 
   async idVerification(data: { userId: string; idNumber: string; idType: string }) {
     try {
-      // Simulate calling a third-party service to verify the ID
       const result = {
         userId: data.userId,
         issuingDate: "20-10-2009",
@@ -30,12 +29,11 @@ class IDVerificationService {
   async logVerification(data) {
     const user = IDVerificationFactory.idVerification(data);
     try {
-      // Save the verification log to the repository
       const logID = await this.idVerificationRepository.save(user);
   
-      // Return log ID for use in other parts of the service/controller
       return logID;
     } catch (error: any) {
+      logger.error({ error: error.message }, "Error verifying ID")
       throw new Error(`Logging verification failed: ${error.message}`);
     }
   }
