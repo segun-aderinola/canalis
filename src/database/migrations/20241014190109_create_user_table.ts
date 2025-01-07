@@ -3,7 +3,7 @@ import { DB_TABLES } from "../../shared/enums/db-tables.enum";
 
 export async function up(knex: Knex): Promise<void> {
   return knex.schema.createTable(DB_TABLES.USERS, (table: Knex.TableBuilder) => {
-    table.uuid("id").primary().defaultTo(knex.raw("uuid_generate_v4()"));
+    table.uuid("id").primary().defaultTo(knex.fn.uuid());
     table.string("name").notNullable();
     table.string("email").notNullable().unique();
     table.string("phoneNumber").notNullable();
@@ -14,7 +14,8 @@ export async function up(knex: Knex): Promise<void> {
     table.string("supervisorId").notNullable();
     table.string("region").notNullable();
     table.boolean("isDefaultPassword").notNullable().defaultTo(true);
-    table.string("status").notNullable().defaultTo('active').comment("active = Active Users, inactive = Inactive users/newly created users that has not changed their default password, deactivated = Deactivated users");;
+    table.string("status").notNullable().defaultTo('active').comment("active = Active Users, inactive = Inactive users/newly created users that has not changed their default password, deactivated = Deactivated users");
+    table.string("signature").nullable();
 
     table.timestamps(true, true, true);
   });

@@ -4,7 +4,6 @@ import { Model, ModelObject } from "objection";
 export class Permission extends Model {
 	static tableName = DB_TABLES.PERMISSIONS;
 	id: string;
-	moduleId: string;
 	name: string;
 	description: string;
 	action: string;

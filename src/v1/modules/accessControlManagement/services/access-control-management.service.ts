@@ -118,6 +118,21 @@ class AccessControlManagementService {
 		const permissions = await this.permissionRepo.getAll();
 		return PermissionFactory.readPermissionsDto(permissions);
 	}
+
+	async createPermission(data: IPermission) {
+		const permissionExist = await this.permissionRepo.findWhere({ name: data.name });
+		if (permissionExist.length > 0) {
+			throw new ConflictError("Permission already exists");
+		}
+
+		const permissionData = PermissionFactory.createPermission(data);
+		const savedPermission = await this.permissionRepo.save(permissionData).catch((error) => {
+			logger.error(`Error creating permission: ${error.message}`);
+			throw new ServiceUnavailableError();
+		});
+		return PermissionFactory.readPermissionDto(savedPermission);
+	}
+
 }
 
 export default AccessControlManagementService;

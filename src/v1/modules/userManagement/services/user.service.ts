@@ -1,4 +1,6 @@
 import { injectable } from "tsyringe";
+import { Response, Request } from "express";
+import { CreateUser } from "../dtos/create-user.dto";
 import UserFactory from "../factories/user.factory";
 import UserRepository from "../repositories/user.repository";
 import {
@@ -9,8 +11,10 @@ import {
 import { ObjectLiteral } from "@shared/types/object-literal.type";
 import MailService from "./mail.service";
 import logger from "@shared/utils/logger";
+import { ErrorResponse, SuccessResponse } from "@shared/utils/response.util";
+import httpStatus from "http-status";
+import ServiceUnavailableError from "@shared/error/service-unavailable.error";
 import { IUser } from "../model/user.model";
-import { CreateUser } from "../dtos/create-user.dto";
 import walletCreationQueue from "../queues/wallet-creation.queue";
 import WalletService from "./wallet.service";
 import WalletRepository from "../repositories/wallet.repository";
@@ -70,10 +74,10 @@ class UserService {
     return await this.userRepository.findOne({ email });
   }
 
-  private async checkSupervisorExistence(supervisorId: string) {
+  async checkSupervisorExistence(supervisorId: string) {
     const supervisor = await this.validateSupervisor(supervisorId);
     if (!supervisor) {
-      return { success: false, message: "Supervisor does not exist." };
+      throw new Error("Supervisor does not exist.");
     }
     return { success: true };
   }
@@ -605,6 +609,49 @@ class UserService {
       return { status: false, message: error.message };
     }
   }
+
+
+async uploadSignature(req: Request, res: Response) {
+  try {
+      const user = await this.userRepository.findById(req.user.userId);
+
+      if (!user){
+        return res
+        .status(httpStatus.CONFLICT)
+        .send(ErrorResponse("User does not exists"));
+      }
+      await this.userRepository.updateById(user.id, {
+        signature: req.body.signature,
+      });
+      return res
+          .status(httpStatus.OK)
+          .send(SuccessResponse("Signature uploaded successfully"));
+  } catch (error: any) {
+      logger.error(`Error uploading signature`);
+      throw new ServiceUnavailableError();
+  }
+}
+
+async uploadProfilePicture(req: Request, res: Response) {
+  try {
+      const user = await this.userRepository.findById(req.user.userId);
+
+      if (!user){
+        return res
+        .status(httpStatus.CONFLICT)
+        .send(ErrorResponse("User does not exists"));
+      }
+      await this.userRepository.updateById(user.id, {
+        avatar: req.body.avatar
+      });
+      return res
+          .status(httpStatus.OK)
+          .send(SuccessResponse("Profile Picture uploaded successfully"));
+  } catch (error: any) {
+      logger.error({ error: error.message }, "Error uploading profile picture");
+      throw new ServiceUnavailableError();
+  }
+}
 }
 
 export default UserService;

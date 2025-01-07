@@ -38,6 +38,7 @@ class MailService {
         logger.error({error: error.message}, "Error sending mail");
     }
   }
+  
   async sendAccountReactivationMail(options: any): Promise<void> {
     const data = {
         name: options.name,
@@ -83,7 +84,32 @@ class MailService {
     } catch (error: any) {
         logger.error({error: error.message}, "Failed to send OTP");   
     }
+  }
 
+  async policyCreationMail(options: any): Promise<void> {
+    const data = {
+        name: options.name,
+        subject: options.subject,
+        email: options.email
+    }
+    try {
+        await this.sendMail(data, options, "policy-creation");
+    } catch (error: any) {
+        logger.error({error: error.message}, "Failed to send OTP"); 
+    }
+  }
+
+  async policyRejectionMail(options: any): Promise<void> {
+    const data = {
+        name: options.name,
+        subject: options.subject,
+        email: options.email
+    }
+    try {
+        await this.sendMail(data, options, "policy-rejection");
+    } catch (error: any) {
+        logger.error({error: error.message}, "Failed to send OTP");   
+    }
   }
   
   private async sendMail(data: any, options: any, template: any): Promise<void> {

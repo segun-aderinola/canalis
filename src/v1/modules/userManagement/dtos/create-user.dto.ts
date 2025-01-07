@@ -13,6 +13,7 @@ export type CreateUser = {
   roleId: string;
   supervisorId?: string;
   region: string;
+  signature?: string
   createdAt?: Date;
   updatedAt?: Date;
 };

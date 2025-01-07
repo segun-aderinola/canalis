@@ -36,4 +36,6 @@
   },
   "include": ["src/**/*.ts", "src/**/*.json"],
   "exclude": ["node_modules", "**/*.spec.ts", "**/*.test.ts"],
+  "typeRoots": ["./node_modules/@types", "./shared/types"]
+
 }

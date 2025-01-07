@@ -9,17 +9,21 @@ type Error = {
 };
 
 export const validate = (rules: ObjectLiteral, validationMessages?: ObjectLiteral) => {
-  return (request: Request, reply: Response, done) => {
-    const validation = new Validator(request.body || request.query, rules, validationMessages);
+	return (request: Request, reply: Response, done) => {
+		const source = { ...request.body, ...request.query, ...request.params };
+		const validation = new Validator(source, rules, validationMessages);
+		const errors = validation.errors.all();
 
-    const errors = validation.errors.all();
+		if (validation.fails()) {
+			return reply
+				.status(400)
+				.send(
+					ErrorResponse("Your data is invalid", createValidationError(errors))
+				);
+		}
 
-    if (validation.fails()) {
-      return reply.status(400).send(ErrorResponse("Your data is invalid", createValidationError(errors)));
-    }
-
-    done();
-  };
+		done();
+	};
 };
 
 export const validateArray = (rulesArray: Array<ObjectLiteral>, validationMessages?: ObjectLiteral) => {

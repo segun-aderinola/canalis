@@ -3,7 +3,7 @@ import { DB_TABLES } from "../../shared/enums/db-tables.enum";
 
 export async function up(knex: Knex): Promise<void> {
   return knex.schema.createTable(DB_TABLES.WALLETS, (table: Knex.TableBuilder) => {
-    table.uuid("id").primary().defaultTo(knex.raw("uuid_generate_v4()"));
+    table.uuid("id").primary().defaultTo(knex.fn.uuid());
     table.string("userId").notNullable();
     table.string("walletId").notNullable();
     table.string("accountNumber").notNullable();

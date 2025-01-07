@@ -19,6 +19,7 @@ export class User extends Model {
   supervisorId?: string;
   status!: string;
   isDefaultPassword!: boolean;
+  signature!: string;
   
   static relationMappings = {
     role: {

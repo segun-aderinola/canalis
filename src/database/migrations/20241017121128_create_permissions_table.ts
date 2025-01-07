@@ -5,14 +5,20 @@ export async function up(knex: Knex): Promise<void> {
 	return knex.schema.createTable(
 		DB_TABLES.PERMISSIONS,
 		(table: Knex.TableBuilder) => {
-			table.uuid("id").primary().defaultTo(knex.raw("uuid_generate_v4()"));
-      table.uuid("moduleId").notNullable().references("id").inTable(DB_TABLES.MODULES);
+			table.uuid("id").primary().defaultTo(knex.fn.uuid());
+			table.uuid("moduleId").notNullable();
 			table.string("name").notNullable().unique();
       table.string("description").notNullable();
       table.string("action").notNullable();
 			table.string("slug").notNullable().unique();
 			table.timestamps(true, true, true);
-      table.index("moduleId");
+
+			table
+				.foreign("moduleId")
+				.references("id")
+				.inTable(DB_TABLES.MODULES)
+				.onDelete("CASCADE")
+				.onUpdate("CASCADE");
 		}
 	);
 }

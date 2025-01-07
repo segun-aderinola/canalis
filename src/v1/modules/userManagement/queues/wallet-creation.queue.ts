@@ -2,13 +2,12 @@ import Queue from 'bull';
 import WalletService from '../services/wallet.service';
 import logger from '@shared/utils/logger';
 import { container } from 'tsyringe';
+import appConfig from "@config/app.config";
 
 const walletCreationQueue = new Queue('wallet-creation', {
   redis: {
-    host: process.env.REDIS_HOST || "127.0.0.1",
-    port: parseInt(process.env.REDIS_PORT || "6379"),
-    password: process.env.REDIS_PASSWORD || undefined,
-    username: process.env.REDIS_USERNAME || undefined,
+    host: appConfig.redis.host,
+    port: appConfig.redis.port
   },
 });
 

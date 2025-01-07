@@ -92,6 +92,25 @@ class UserManagementController {
     }    
   };
   
+  uploadSignature = async (req: Request, res: Response) => {
+		const role: any = await this.userService.uploadSignature(
+      req,
+			res
+		);
+		return res
+			.status(httpStatus.CREATED)
+			.send(SuccessResponse("Profile Picture uploaded successfully", role));
+	};
+
+  profilePictureUpload = async (req: Request, res: Response) => {
+    const role: any = await this.userService.uploadProfilePicture(
+        req,
+        res
+    );
+    return res
+        .status(httpStatus.CREATED)
+        .send(SuccessResponse("Profile Picture uploaded successfully", role));
+};
 }
 
 export default UserManagementController;

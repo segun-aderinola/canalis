@@ -70,6 +70,13 @@ class AccessControlManagementController {
 
 		return res.status(httpStatus.OK).send(SuccessResponse("Operation successful", response));
 	};
+
+	createPermission = async (req: Request, res: Response) => {
+		const response =
+			await this.accessControlManagementService.createPermission(req.body);
+
+		return res.status(httpStatus.CREATED).send(SuccessResponse("Operation successful", response));
+	}
 }
 
 export default AccessControlManagementController;

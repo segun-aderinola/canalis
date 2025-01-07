@@ -6,8 +6,9 @@ import { ErrorResponse } from "@shared/utils/response.util";
 import initializeDatabase from "./database";
 import Validator from "validatorjs";
 import "./shared/subscribers/audit-log.subscriber";
+import httpStatus from "http-status";
 
-function bootstrapApp(app: express.Application) {
+export function bootstrapApp(app: express.Application) {
   registerThirdPartyModules(app);
   initializeDatabase();
   registerCustomValidationRules();
@@ -16,7 +17,8 @@ function bootstrapApp(app: express.Application) {
 
 function registerThirdPartyModules(app: express.Application) {
   app.use(cors({ origin: true }));
-  // Uncomment if needed: loggerPlugin(app);
+	app.use(express.json({ limit: "50mb" }));
+	app.use(express.urlencoded({ extended: true }));
 }
 
 function registerCustomValidationRules() {
@@ -65,15 +67,24 @@ function registerCustomValidationRules() {
   );
 }
 
-function setErrorHandler(app: express.Application) {
-  app.use((err, _req, res, _next) => {
-    const statusCode = err.statusCode || 503;
-    const message = err instanceof AppError ? err.message : "We are unable to process this request. Please try again.";
+export function setErrorHandler(app: express.Application) {
+	app.use((err, _req, res, _next) => {
+		const statusCode = err.statusCode || 503;
+		const message =
+			err instanceof AppError
+				? err.message
+				: "We are unable to process this request. Please try again.";
 
-    Logger.error({ err: err.cause || err });
+		Logger.error({ err: err.cause || err });
 
-    res.status(statusCode).json(ErrorResponse(message));
-  });
+		res.status(statusCode).json(ErrorResponse(message));
+	});
 }
 
-export default bootstrapApp;
+export function setUndefinedRoutesErrorHandler(app: express.Application) {
+	app.use((req, res, _next) => {
+		const message = `Cannot ${req.method} ${req.originalUrl}`;
+		res.status(httpStatus.NOT_FOUND).json(ErrorResponse(message));
+	});
+}
+

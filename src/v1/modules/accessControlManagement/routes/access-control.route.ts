@@ -20,7 +20,7 @@ const router = express.Router();
 router.post(
 	"/admin/roles",
 	validate(createRoleRules),
-	// accessControlMiddleware(AccessControls.ROLE_CREATION),
+	accessControlMiddleware(AccessControls.ROLE_CREATION),
 	(req: Request, res: Response, next) => {
 		accessControlManagementController.createRole(req, res).catch(e => next(e));
 	}
@@ -37,7 +37,7 @@ router.get(
 
 router.get(
 	"/admin/roles",
-	// accessControlMiddleware(AccessControls.ROLE_LIST),
+	accessControlMiddleware(AccessControls.ROLE_LIST),
 	(_req: Request, res: Response, next) => {
 		accessControlManagementController.getAllRoles(res).catch(e => next(e));
 	}
@@ -46,7 +46,7 @@ router.get(
 router.put(
 	"/admin/roles/:id",
 	validate(updateRoleRules),
-	// accessControlMiddleware(AccessControls.ROLE_UPDATE),
+	accessControlMiddleware(AccessControls.ROLE_UPDATE),
 	(req: Request, res: Response, next) => {
 		accessControlManagementController.updateRole(req, res).catch(e => next(e));
 	}
@@ -67,6 +67,10 @@ router.get("/admin/permissions/:id", (req: Request, res: Response, next) => {
 
 router.get("/admin/permissions", (_req: Request, res: Response, next) => {
 	accessControlManagementController.getAllPermissions(res).catch(e => next(e));
+});
+
+router.post("/admin/permissions", (req: Request, res: Response, next) => {
+	accessControlManagementController.createPermission(req, res).catch(e => next(e));
 });
 
 export default router;

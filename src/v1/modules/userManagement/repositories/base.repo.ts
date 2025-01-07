@@ -111,8 +111,6 @@ export class BaseRepository<T, M extends Model> {
   }
   
   
-  
-
   async findWhere(filter: ObjectLiteral, relations: string[] = []): Promise<T[]> {
     const query = this.model.query();
 
