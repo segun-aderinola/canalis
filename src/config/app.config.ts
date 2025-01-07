@@ -31,7 +31,7 @@ const appConfig = {
 	},
 	quotation: {
 		base_url: String(process.env.QUOTATIONS_SERVICE_URL),
-	}
+	},
 };
 
 export default appConfig;
