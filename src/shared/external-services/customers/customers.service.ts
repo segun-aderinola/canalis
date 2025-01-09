@@ -14,7 +14,10 @@ export class CustomerService implements ICustomerServiceActions {
 
 	private constructor() {
 		this.httpClient = HTTPClient.create({
-			baseURL: appConfig.customer.base_url
+			baseURL: appConfig.api_gateway.base_url,
+			headers: {
+				"x-secret-key": appConfig.api_gateway.secret_key,
+			},
 		});
 	}
 

@@ -1,6 +1,11 @@
 import { AxiosInstance } from "axios";
 import { IProductServiceActions } from "./products.interface";
-import { IUnpaginatedProductsRes, IProductResponse, ISingleProductRes } from "./products.types";
+import {
+	IProductsRes,
+	IProductResponse,
+	ISingleProductRes,
+	IProductPayload,
+} from "./products.types";
 import HTTPClient from "@shared/http-client/http-client";
 import appConfig from "@config/app.config";
 import logger from "@shared/utils/logger";
@@ -11,34 +16,39 @@ import AppError from "@shared/error/app.error";
 export class ProductService implements IProductServiceActions {
 	private static instance: ProductService;
 	private httpClient: AxiosInstance;
+	private url: string;
 
 	private constructor() {
 		this.httpClient = HTTPClient.create({
-			baseURL: appConfig.coreBusinessApplication.generalInsurance.base_url,
+			baseURL: appConfig.api_gateway.base_url,
+			headers: {
+				"x-secret-key": appConfig.api_gateway.secret_key,
+			},
 		});
+		this.url = "general/products";
 	}
 
-	async getUnpaginatedProducts(): Promise<IUnpaginatedProductsRes[]> {
-		const url = `/unpaginated`;
+	async getProducts(query: IProductPayload): Promise<IProductsRes[]> {
+		const path = `/${this.url}?page=${query.page}&perPage=${query.perPage}&search=${query.search}`;
 		const response = await this.httpClient
-			.get<IProductResponse<IUnpaginatedProductsRes[]>>(url)
+			.get<IProductResponse<IProductsRes[]>>(path)
 			.catch((e) => {
-				return this.errorHandler(e, null, "getUnpaginatedProducts");
+				return this.errorHandler(e, null, "getProducts");
 			});
-		this.requestResponseLogger(undefined, response, url);
+		this.requestResponseLogger(undefined, response, path);
 		return response.data.data;
 	}
 
-  async getProductById(id: string): Promise<ISingleProductRes> {
-    const url = `/${id}`;
-    const response = await this.httpClient
+	async getProductById(id: string): Promise<ISingleProductRes> {
+		const url = `/${id}`;
+		const response = await this.httpClient
 			.get<IProductResponse<ISingleProductRes>>(url)
 			.catch((e) => {
 				return this.errorHandler(e, null, "getProductById");
 			});
 		this.requestResponseLogger({ id }, response, url);
 		return response.data.data;
-  }
+	}
 
 	private errorHandler = (e: any, payload, action) => {
 		const errorMessage =

@@ -8,6 +8,7 @@ export class Permission extends Model {
 	description: string;
 	action: string;
 	slug: string;
+	moduleId: string;
 	createdAt: Date;
 	updatedAt: Date;
 }

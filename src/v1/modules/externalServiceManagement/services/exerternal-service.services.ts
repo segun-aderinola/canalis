@@ -3,9 +3,9 @@ import { ProductService } from "@shared/external-services/products";
 import { PaymentService } from "@shared/external-services/payments";
 import { CustomerService } from "@shared/external-services/customers";
 import { QuoteService } from "@shared/external-services/quotes";
-import { ISingleProductRes, IUnpaginatedProductsRes } from "@shared/external-services/products/products.types";
+import { ISingleProductRes, IProductsRes } from "@shared/external-services/products/products.types";
 import { IGenerateQuoteResponse, IGetQuoteByIdRes, IGetQuotesRes } from "@shared/external-services/quotes/quotes.types";
-import { GetQuoteDTO, GetQuotesDTO, OnboardCustomerDTO, PaymentLinkDTO, PremiumDTO, QuoteDTO } from "../dtos/external-service.dto";
+import { GetQuoteDTO, GetQuotesDTO, OnboardCustomerDTO, PaymentLinkDTO, PremiumDTO, QuoteDTO, GetProductsDTO } from "../dtos/external-service.dto";
 import ExternalServiceFactory from "../factories/external-service.factory";
 import { IPaymentLinkRes } from "@shared/external-services/payments/payments.types";
 import { IOnboardCustomerRes } from "@shared/external-services/customers/customers.types";
@@ -19,8 +19,8 @@ class ExternalService {
 		private readonly quoteService: QuoteService
 	) {}
 
-	async getProducts(): Promise<IUnpaginatedProductsRes[]> {
-		return await this.productService.getUnpaginatedProducts();
+	async getProducts(dto: GetProductsDTO): Promise<IProductsRes[]> {
+		return await this.productService.getProducts(dto);
 	}
 
 	async getSingleProduct(id: string): Promise<ISingleProductRes> {

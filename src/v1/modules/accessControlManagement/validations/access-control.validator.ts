@@ -21,4 +21,5 @@ export const createPermissionRules = {
 	name: "required|string|min:5|max:100",
 	description: "string|min:5|max:100",
 	action: "required|string|min:100",
+	moduleId: "required|uuid",
 };
