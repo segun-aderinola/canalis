@@ -53,7 +53,7 @@ export async function seed(knex: Knex): Promise<void> {
 			roleId: "5bd43ccb-512d-409e-8bf6-95fd0ea0d9e8",
 			supervisorId: "7ed43ccb-512d-409e-8bf6-95fd0ea0d9f4",
 			region: "North",
-			isDefaultPassword: true,
+			isDefaultPassword: false,
 			status: "active",
 			signature: null,
 		},
