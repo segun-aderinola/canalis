@@ -18,6 +18,18 @@ data:
   API_GATEWAY_URL: "https://emple-general-apigateway-service-dev.incanalis.com/v1"
   API_GATEWAY_SECRET_KEY: "0ffeaec3-f53a-4563-a7d8-0d1d4d206c23"
   FINANCE_SERVICE_URL: "https://emple-shared-payments-service-dev.incanalis.com/v1/payments"
+  JWT_SECRET: "Canalis"
+  SESSION: "3600"
+  SESSION_SECRET: "Canalis"
+  MAIL_HOST: "gmail"
+  MAIL_SERVICE: "gmail"
+  MAIL_PORT: "465"
+  MAIL_USERNAME: "add_your_value"
+  MAIL_PASSWORD: "add_your_passsword"
+  FROM_EMAIL: "Emple"
+  FROM_NAME: "Emple"
+  QUEUE_ATTEMPTS: "3"
+  QUEUE_DELAY: "5000"
  
  
 
