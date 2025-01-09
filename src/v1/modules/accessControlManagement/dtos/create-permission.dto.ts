@@ -3,4 +3,5 @@ export type CreatePermission = {
   description: string;
   action: string;
   slug: string;
+  moduleId: string;
 };

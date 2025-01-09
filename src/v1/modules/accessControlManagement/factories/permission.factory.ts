@@ -9,6 +9,7 @@ class PermissionFactory {
 		permission.name = data.name;
 		permission.description = data.description;
 		permission.action = data.action;
+		permission.moduleId = data.moduleId;
 		permission.slug = slugify(data.name, { lower: true });
 
 		return permission;
@@ -21,6 +22,7 @@ class PermissionFactory {
 		permission.name = data.name;
 		permission.description = data.description;
 		permission.action = data.action;
+		permission.moduleId = data.moduleId;
 		permission.slug = data.slug;
 
 		return permission;

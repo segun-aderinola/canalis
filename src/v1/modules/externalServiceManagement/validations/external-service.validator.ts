@@ -55,3 +55,10 @@ export const getQuotesRules = {
 }
 
 export const getSingleQuoteHistoryRules = getSingleQuoteRules;
+
+export const getProductsRules = {
+	search: "string",
+	page: "numeric",
+	perPage: "numeric",
+};
+

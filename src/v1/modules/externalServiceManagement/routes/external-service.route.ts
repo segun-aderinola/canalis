@@ -10,6 +10,7 @@ import {
 	onboardCustomerRules,
 	getSingleQuoteRules,
 	getQuotesRules,
+	getProductsRules,
 } from "../validations/external-service.validator";
 
 const externalServiceController = container.resolve(ExternalServiceController);
@@ -17,6 +18,7 @@ const router = express.Router();
 
 router.get(
 	"/external-services/products",
+	validate(getProductsRules),
 	(req: Request, res: Response, next) => {
 		externalServiceController.getProducts(req, res).catch((e) => next(e));
 	}

@@ -31,7 +31,11 @@ const appConfig = {
 	},
 	quotation: {
 		base_url: String(process.env.QUOTATIONS_SERVICE_URL),
-	}
+	},
+	api_gateway: {
+		base_url: String(process.env.API_GATEWAY_URL),
+		secret_key: String(process.env.API_GATEWAY_SECRET_KEY),
+	},
 };
 
 export default appConfig;

@@ -18,4 +18,4 @@ npm install
 
 # Run the migration and check for failure
 npm run db:migrate || { echo "Database migration failed!"; exit 1; }
-# npm run db:seed
+npm run db:seed || { echo "Database seeding failed!"; exit 1; }

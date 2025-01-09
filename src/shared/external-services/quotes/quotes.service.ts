@@ -14,14 +14,17 @@ export class QuoteService implements IQuoteServiceActions {
 
 	private constructor() {
 		this.httpClient = HTTPClient.create({
-			baseURL: appConfig.quotation.base_url,
+			baseURL: appConfig.api_gateway.base_url,
+			headers: {
+				"x-secret-key": appConfig.api_gateway.secret_key,
+			},
 		});
 	}
 
 	async generateQuote(
 		payload: IGenerateQuotePayload
 	): Promise<IGenerateQuoteResponse> {
-		const url = ``;
+		const url = `/quotations`;
 		const response = await this.httpClient
 			.post<IQuoteResponse<IGenerateQuoteResponse>>(url, payload)
 			.catch((e) => {
@@ -32,7 +35,7 @@ export class QuoteService implements IQuoteServiceActions {
 	}
 
 	async getQuotes(payload: IGetQuotesPayload): Promise<IGetQuotesRes[]> {
-		const url = `?quotationNumber${payload.quotationNumber}&page=${payload.page}&perPage=${payload.perPage}`;
+		const url = `/quotations/?quotationNumber${payload.quotationNumber}&page=${payload.page}&perPage=${payload.perPage}`;
 		const response = await this.httpClient
 			.get<IQuoteResponse<IGetQuotesRes[]>>(url)
 			.catch((e) => {

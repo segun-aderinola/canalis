@@ -4,7 +4,7 @@ export interface IProductResponse<T>{
  data: T;
 }
 
-export interface IUnpaginatedProductsRes {
+export interface IProductsRes {
 	id: string;
 	name: string;
 	slug: string;
@@ -17,6 +17,12 @@ export interface IUnpaginatedProductsRes {
     name: string;
     code: string;
 	};
+}
+
+export interface IProductPayload {
+	search?: string;
+	page?: number;
+	perPage?: number;
 }
 
 interface IRisk {

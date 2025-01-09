@@ -1,4 +1,5 @@
 import { IOnboardCustomerPayload } from "@shared/external-services/customers/customers.types";
+import { IProductPayload } from "@shared/external-services/products/products.types";
 import { IGetQuotesPayload, IGenerateQuotePayload, IGetQuoteByIdPayload } from "@shared/external-services/quotes/quotes.types";
 
 export type PremiumDTO = {
@@ -18,3 +19,5 @@ export type PaymentLinkDTO = {
 }
 
 export type OnboardCustomerDTO = IOnboardCustomerPayload;
+
+export type GetProductsDTO = IProductPayload;

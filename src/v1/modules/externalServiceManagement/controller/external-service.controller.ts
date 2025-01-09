@@ -7,8 +7,12 @@ import ExternalService from "../services/exerternal-service.services";
 class ExternalServiceController {
 	constructor(private readonly externalService: ExternalService) {}
 
-	getProducts = async (_req: Request, res: Response) => {
-		const response = await this.externalService.getProducts();
+	getProducts = async (req: Request, res: Response) => {
+		const response = await this.externalService.getProducts({
+			search: (req.query.search as string) || "",
+			page: parseInt(req.query.page as string) || 1,
+			perPage: parseInt(req.query.perPage as string) || 10,
+		});
 
 		res.send(SuccessResponse("Operation successful", { response }));
 	};
