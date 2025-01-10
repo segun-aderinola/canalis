@@ -7,6 +7,7 @@ import OTPService from "./otp.service";
 import { bcryptCompareHashedString } from "@shared/utils/hash.util";
 import MailService from "./mail.service";
 import logger from "@shared/utils/logger";
+import AppError from "@shared/error/app.error";
 
 @injectable()
 class AuthService {
@@ -21,7 +22,7 @@ class AuthService {
     try {
       const user = await this.userRepository.findOne({ email: data.email });
       if (!user) {
-        return { success: false, message: "User not found" };
+        throw new AppError(400, "User not found");
       }
       // generate a password reset link
       const token = generateCode(6);
@@ -39,7 +40,7 @@ class AuthService {
     try {
       const user = await this.userRepository.findOne({ email: data.email });
       if (!user) {
-        return { success: false, message: "User not found" };
+        throw new AppError(400, "User not found");
       }
 
       const checkOtp = await this.OtpRepository.findOne({
@@ -58,10 +59,7 @@ class AuthService {
       const currentTime = new Date();
       const expirationTime = new Date(checkOtp.expiringDatetime);
       if (isAfter(currentTime, expirationTime)) {
-        return {
-          success: false,
-          message: "OTP has expired",
-        };
+        throw new AppError(400, "OTP has expired");
       }
   
       const id = checkOtp.id;
@@ -87,11 +85,11 @@ class AuthService {
     try {
       const user = await this.userRepository.findOne({ id: data.userId });
       if (!user) {
-        return { success: false, message: "User not found" };
+        throw new AppError(400, "User not found");
       }
 
       if(user.isDefaultPassword == false){
-        return { success: false, message: "Can`t perform this action!. Your password has been changed already."}
+        throw new AppError(400, "Can`t perform this action!. Your password has been changed already.");
       }
       const id = user.id;
       
@@ -124,13 +122,13 @@ class AuthService {
       }
       
       if (user.status == "deactivated") {
-        return { success: false, message: "Your account has been deactivated. Please contact administrator."}
+        throw new AppError(400, "Your account has been deactivated. Please contact administrator.");
       }
 
       const passwordMatch = await bcryptCompareHashedString(data.password, user?.password);
       
       if (!passwordMatch) {
-        return { success: false, message: "Password is incorrect. Kindly check!"}
+        throw new AppError(400, "Password is incorrect. Kindly check!");
       }
 
       const token = await generateJwtToken(user);

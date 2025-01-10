@@ -27,8 +27,6 @@ class PolicyFactory {
     policy.ourSharePercentage = data.ourSharePercentage;
     policy.classOfBusinessId = data.classOfBusinessId;
     policy.currency = data.currency;
-    policy.status = data.status;
-    policy.cbaStatus = data.cbaStatus;
     policy.savingsGoal = data.savingsGoal;
     policy.paymentFrequency = data.paymentFrequency;
     policy.annualRiskCover = data.annualRiskCover;

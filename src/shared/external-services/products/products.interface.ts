@@ -3,5 +3,5 @@ import { ISingleProductRes, IProductsRes, IProductPayload } from "./products.typ
 
 export interface IProductServiceActions {
 	getProducts(payload: IProductPayload): Promise<IProductsRes[]>;
-	getProductById(payload: string): Promise<ISingleProductRes>;
+	getProductById(id: string, accessToken: string): Promise<ISingleProductRes>;
 }

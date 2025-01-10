@@ -30,8 +30,13 @@ export class ProductService implements IProductServiceActions {
 
 	async getProducts(query: IProductPayload): Promise<IProductsRes[]> {
 		const path = `/${this.url}?page=${query.page}&perPage=${query.perPage}&search=${query.search}`;
+		const accessToken = query.accessToken;
 		const response = await this.httpClient
-			.get<IProductResponse<IProductsRes[]>>(path)
+			.get<IProductResponse<IProductsRes[]>>(path, {
+				headers: {
+					Authorization: `Bearer ${accessToken}`,
+				},
+			})
 			.catch((e) => {
 				return this.errorHandler(e, null, "getProducts");
 			});
@@ -39,14 +44,18 @@ export class ProductService implements IProductServiceActions {
 		return response.data.data;
 	}
 
-	async getProductById(id: string): Promise<ISingleProductRes> {
-		const url = `/${id}`;
+	async getProductById(id: string, accessToken: string): Promise<ISingleProductRes> {
+		const path = `/${this.url}/${id}`;
 		const response = await this.httpClient
-			.get<IProductResponse<ISingleProductRes>>(url)
+			.get<IProductResponse<ISingleProductRes>>(path, {
+				headers: {
+					Authorization: `Bearer ${accessToken}`,
+				},
+			})
 			.catch((e) => {
 				return this.errorHandler(e, null, "getProductById");
 			});
-		this.requestResponseLogger({ id }, response, url);
+		this.requestResponseLogger({ id }, response, path);
 		return response.data.data;
 	}
 

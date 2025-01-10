@@ -23,6 +23,7 @@ export interface IProductPayload {
 	search?: string;
 	page?: number;
 	perPage?: number;
+	accessToken?: string;
 }
 
 interface IRisk {

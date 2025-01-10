@@ -3,6 +3,7 @@ import axios from "axios";
 import logger from "@shared/utils/logger";
 import WalletRepository from "../repositories/wallet.repository";
 import { IUser } from "../model/user.model";
+import AppError from "@shared/error/app.error";
 
 @injectable()
 class WalletService {
@@ -42,12 +43,8 @@ class WalletService {
       }
     } catch (error: any) {
       logger.error({ error: error.message }, "Error creating wallet");
-      return {
-        success: false,
-        message:
-          error.message ||
-          "An unexpected error occurred while creating the user",
-      };
+      throw new AppError(400, error.message ||
+          "An unexpected error occurred while creating the user");
     }
   }
 

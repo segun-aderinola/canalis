@@ -23,8 +23,8 @@ class ExternalService {
 		return await this.productService.getProducts(dto);
 	}
 
-	async getSingleProduct(id: string): Promise<ISingleProductRes> {
-		return await this.productService.getProductById(id);
+	async getSingleProduct(id: string, token: string): Promise<ISingleProductRes> {
+		return await this.productService.getProductById(id, token);
 	}
 
 	async generatePremium(dto: PremiumDTO) {

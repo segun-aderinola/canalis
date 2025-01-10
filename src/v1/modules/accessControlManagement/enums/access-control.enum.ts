@@ -10,4 +10,13 @@ export enum AccessControls {
 	ROLE_LIST = "role_list",
 	ROLE_UPDATE = "role_update",
 	ROLE_DELETION = "role_deletion",
+	ROLE_ASSIGNMENT = "role_assignment",
+	POLICY_CREATION = "policy_creation",
+	POLICY_LIST = "policy_list",
+	POLICY_APPROVAL = "policy_approval",
+	POLICY_REJECTION = "policy_rejection",
+	PRODUCT_CREATION = "product_creation",
+	PRODUCT_LIST = "product_list",
+	QUOTE_CREATION = "quotes_creation",
+	QUOTE_LIST = "quotes_list",
 }

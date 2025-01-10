@@ -69,7 +69,17 @@ export const generateToken = async () => {
 export const generateJwtToken = async (user: any) => {
   const secret_key: any = process.env.JWT_SECRET;
   const session = process.env.SESSION;
-  const token = jwt.sign({ userId: user.id }, secret_key, { expiresIn: session });
+  const token = jwt.sign(
+		{
+			userId: user.id,
+			role: user.role,
+			email: user.email,
+			name: user.name,
+			phoneNumber: user.phoneNumber,
+		},
+		secret_key,
+		{ expiresIn: session }
+	);
   return token;
 };
 

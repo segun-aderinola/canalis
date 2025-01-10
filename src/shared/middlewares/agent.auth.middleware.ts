@@ -19,6 +19,8 @@ const agentAuthMiddleware = async (req: Request, res: Response, done) => {
     }
     (req as any).user = payload;
 
+    (req as any).accessToken = authToken;
+
     done();
   } catch (err) {
     return res.status(httpStatus.UNAUTHORIZED).send(ErrorResponse("You are unauthorized"));
