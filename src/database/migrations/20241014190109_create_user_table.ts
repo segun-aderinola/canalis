@@ -10,7 +10,7 @@ export async function up(knex: Knex): Promise<void> {
     table.string("password").notNullable();
     table.string("avatar").nullable();
     table.string("address").notNullable();
-    table.string("roleId").notNullable();
+    table.string("role").notNullable();
     table.string("supervisorId").notNullable();
     table.string("region").notNullable();
     table.boolean("isDefaultPassword").notNullable().defaultTo(true);

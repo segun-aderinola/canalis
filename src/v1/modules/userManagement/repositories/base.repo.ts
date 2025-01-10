@@ -145,7 +145,6 @@ export class BaseRepository<T, M extends Model> {
   }
 
   async findAll(filter: ObjectLiteral): Promise<T[]> {
-    console.log("Filter received for findWhere:", filter);
     const query = this.model.query();
     return await query.where(filter);
   }

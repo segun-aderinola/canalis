@@ -18,6 +18,8 @@ import { IUser } from "../model/user.model";
 import walletCreationQueue from "../queues/wallet-creation.queue";
 import WalletService from "./wallet.service";
 import WalletRepository from "../repositories/wallet.repository";
+import AppError from "@shared/error/app.error";
+
 
 @injectable()
 class UserService {
@@ -57,12 +59,9 @@ class UserService {
       };
     } catch (error: any) {
       logger.error({ error: error.message }, "Error creating user");
-      return {
-        success: false,
-        message:
-          error.message ||
-          "An unexpected error occurred while creating the user",
-      };
+      throw new AppError(400, error.message ||
+          "An unexpected error occurred while creating the user");
+
     }
   }
 
@@ -77,7 +76,7 @@ class UserService {
   async checkSupervisorExistence(supervisorId: string) {
     const supervisor = await this.validateSupervisor(supervisorId);
     if (!supervisor) {
-      throw new Error("Supervisor does not exist.");
+      throw new AppError(400, "Supervisor does not exist");
     }
     return { success: true };
   }
@@ -85,7 +84,7 @@ class UserService {
   private async checkIfUserExists(email: string) {
     const existingUser = await this.checkExistingUser(email);
     if (existingUser) {
-      return { success: false, message: "User already exists with this email" };
+      throw new AppError(400, "User already exists with this email");
     }
     return { success: true };
   }
@@ -97,7 +96,7 @@ class UserService {
     if (isValidUUID(supervisorId)) {
       supervisorFilter.id = supervisorId;
     } else {
-      throw new Error("Invalid supervisorId UUID format.");
+      throw new AppError(400, "Invalid supervisorId UUID format.");
     }
 
     return await this.userRepository.findOrWhere(supervisorFilter, undefined, {
@@ -116,7 +115,7 @@ class UserService {
       return { success: true, data: createdUser };
     } catch (error: any) {
       logger.error({ error: error.message }, "Error creating user record");
-      return { success: false, message: "Failed to create user record" };
+      throw new AppError(400, "Failed to create user record");
     }
   }
 
@@ -155,7 +154,6 @@ class UserService {
         data: { added, notAdded },
       };
     } catch (error: any) {
-      console.log(error);
       logger.error(
         { error: JSON.stringify(error) },
         "UserSerivce [BulkUserOnboarding]: Error Creating User"
@@ -169,10 +167,8 @@ class UserService {
       return { success: true };
     } catch (error: any) {
       logger.error({ error: error.message }, "Error sending email");
-      return {
-        success: false,
-        message: "Failed to send account creation email.",
-      };
+      throw new AppError(400, "Failed to send account creation email.");
+
     }
   }
 
@@ -496,11 +492,11 @@ class UserService {
 
     const user = await this.userRepository.findById(id);
     if (!user) {
-      return { success: false, message: "User not found" };
+      throw new AppError(400, "User not found");
     }
 
     if (user.status === "inactive") {
-      return { success: false, message: "User account is already deactivated" };
+      throw new AppError(400, "User account is already deactivated");
     }
 
     try {
@@ -515,7 +511,7 @@ class UserService {
       };
     } catch (error) {
       logger.error({ error: error }, "Error deactivating user:");
-      return { success: false, message: "Failed to deactivate user account" };
+      throw new AppError(400, "Failed to deactivate user account");
     }
   }
 
@@ -524,11 +520,11 @@ class UserService {
 
     const user = await this.userRepository.findById(id);
     if (!user) {
-      return { success: false, message: "User not found" };
+      throw new AppError(400, "User not found");
     }
 
     if (user.status === "active") {
-      return { success: false, message: "User account is already activated" };
+      throw new AppError(400, "User account is already activated");
     }
 
     const password = generateCode(5);
@@ -560,16 +556,16 @@ class UserService {
       };
     } catch (error: any) {
       logger.error({ error: error.message }, "Error deactivating user");
-      return { success: false, message: "Failed to deactivate user account" };
+      throw new AppError(400, "Failed to activate user account");      
     }
   }
 
-  async updateUser(req) {
+  async updateUser(req: Request) {
     try {
       const data = req.body;
       const user = await this.userRepository.findById(req.params.id);
       if (!user) {
-        return { success: false, message: "User not found." };
+        throw new AppError(400, "User does not exist");
       }
 
       const supervisorFilter: ObjectLiteral = {};
@@ -578,10 +574,7 @@ class UserService {
         supervisorFilter.email = data.supervisorId;
       } else {
         if (!isValidUUID(data.supervisorId)) {
-          return {
-            success: false,
-            message: "Invalid supervisorId UUID format",
-          };
+          throw new AppError(400, "Invalid supervisorId UUID format");
         }
         supervisorFilter.id = data.supervisorId;
       }
@@ -591,7 +584,7 @@ class UserService {
         { roleId: "supervisor" }
       );
       if (!supervisor) {
-        return { success: false, message: "Supervisor does not exists" };
+        throw new AppError(400, "Supervisor does not exist");
       }
       await this.userRepository.updateById(req.params.id, {
         name: data.name,
@@ -606,7 +599,7 @@ class UserService {
       };
     } catch (error: any) {
       logger.error({ error: error.message }, "Failed to update user");
-      return { status: false, message: error.message };
+      throw new AppError(400, error.message);
     }
   }
 

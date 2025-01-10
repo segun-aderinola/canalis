@@ -8,10 +8,11 @@ import { IPolicy } from "../model/policy.model";
 import NotFoundError from "@shared/error/not-found.error";
 import UserRepository from "../../userManagement/repositories/user.repository";
 import { IUser } from "../../userManagement/model/user.model";
-import { createPolicy } from "@shared/external-services/policy.service";
+import { createPolicy } from "@shared/external-services/policies/policy.service";
 import MailService from "../../userManagement/services/mail.service";
 import NotificationService from "./notification.service";
 import UserService from "../../userManagement/services/user.service";
+import ServiceUnavailableError from "@shared/error/service-unavailable.error";
 @injectable()
 class PolicyService {
   constructor(
@@ -42,9 +43,7 @@ class PolicyService {
   }
 
   public async getPolicyByAgentId(req: Request) {
-    console.log(req.params.id);
     const agentExist: IUser = await this.userRepository.findById(req.params.id);
-    console.log(agentExist);
     if (!agentExist) {
       throw new NotFoundError();
     }
@@ -77,6 +76,9 @@ class PolicyService {
       const policy: IPolicy = await this.policyRepository.findById(
         req.params.id
       );
+      if(!policy) {
+        throw new NotFoundError();
+      }
 
       const policyCreation = await createPolicy(policy);
       await this.policyRepository.updateById(req.params.id, {
@@ -120,6 +122,9 @@ class PolicyService {
 
   async rejectPolicy(req: Request) {
     const policy: IPolicy = await this.policyRepository.findById(req.params.id);
+    if(!policy) {
+      throw new NotFoundError();
+    }
     await this.policyRepository.updateById(req.params.id, {
       status: "rejected",
     });
@@ -134,11 +139,11 @@ class PolicyService {
   }
 
   private handlePolicyError = (policy: IPolicy, error: any) => {
-    console.log(error);
     logger.error(
       { error, policy },
       "PolicyService[handlePolicyError]: Error occured creating Policy."
     );
+    throw new ServiceUnavailableError();
   };
 
   async sendPolicyCreationMail(policy: IPolicy) {
@@ -160,6 +165,9 @@ class PolicyService {
 
   async sendPolicyRejectionMail(policy: IPolicy) {
     const user = await this.userRepository.findById(policy.agentId);
+    if(!user) {
+      throw new NotFoundError(`Agent with this ID ${policy.agentId} not found`);
+    }
     const data = {
       subject: "Policy Rejected",
       name: user.name,

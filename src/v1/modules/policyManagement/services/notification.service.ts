@@ -4,6 +4,7 @@ import { CreateNotification } from "../dtos/notification.dto";
 import { INotification } from "../model/notification.model";
 import NotificationRepository from "../repositories/notification.repository";
 import NotificationFactory from "../factories/notification.factory";
+import ServiceUnavailableError from "@shared/error/service-unavailable.error";
 @injectable()
 class NotificationService {
   constructor(
@@ -23,11 +24,11 @@ class NotificationService {
   }
 
   private handleNotificationError = (notification: INotification, error: any) => {
-    console.log(error);
     logger.error(
       { error, notification },
       "NotificationService[handleNotificationError]: Error occured creating Notification."
     );
+    throw new ServiceUnavailableError();
   };
 }
 

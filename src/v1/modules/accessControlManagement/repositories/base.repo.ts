@@ -66,8 +66,8 @@ export class BaseRepository<T, M extends Model> {
 	}
 
 	
-	async findByNameWithRelations(name: string, relations: string[] = []) {
-		const query = this.model.query().findOne({ name });
+	async findByNameWithRelations(slug: string, relations: string[] = []) {
+		const query = this.model.query().findOne({ slug });
 
 		for (const relation of relations) {
 			query.withGraphFetched(relation);

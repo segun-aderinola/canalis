@@ -30,6 +30,7 @@ export interface IGenerateQuotePayload {
 	brokerName: string;
 	brokerPhoneNumber: string;
 	covers: ICovers[];
+	accessToken?: string;
 }
 
 interface IQuote {
@@ -70,6 +71,7 @@ export interface IGetQuotesPayload {
 	quotationNumber: string;
 	page: number;
 	perPage: number;
+	accessToken?: string;
 }
 
 export interface IGetQuotesRes {
@@ -84,6 +86,7 @@ export interface IGetQuotesRes {
 
 export interface IGetQuoteByIdPayload {
 	id: string;
+	accessToken?: string;
 }
 
 export interface IGetQuoteByIdRes {

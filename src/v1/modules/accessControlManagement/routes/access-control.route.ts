@@ -11,6 +11,7 @@ import {
 } from "../validations/access-control.validator";
 import accessControlMiddleware from "@shared/middlewares/access-control.middleware";
 import { AccessControls } from "..//enums/access-control.enum";
+import authMiddleware from "@shared/middlewares/auth.middleware";
 
 const accessControlManagementController = container.resolve(
 	AccessControlManagementController
@@ -19,8 +20,11 @@ const router = express.Router();
 
 router.post(
 	"/admin/roles",
-	validate(createRoleRules),
-	accessControlMiddleware(AccessControls.ROLE_CREATION),
+	[
+		validate(createRoleRules),
+		authMiddleware,
+		accessControlMiddleware(AccessControls.ROLE_CREATION)
+	],
 	(req: Request, res: Response, next) => {
 		accessControlManagementController.createRole(req, res).catch(e => next(e));
 	}
@@ -28,8 +32,11 @@ router.post(
 
 router.get(
 	"/admin/roles/:id",
-	validate(getRoleRules),
-	accessControlMiddleware(AccessControls.ROLE_LIST),
+	[
+		validate(getRoleRules),
+		authMiddleware,
+		accessControlMiddleware(AccessControls.ROLE_LIST),
+	],
 	(req: Request, res: Response, next) => {
 		accessControlManagementController.getRole(req, res).catch(e => next(e));
 	}
@@ -37,7 +44,7 @@ router.get(
 
 router.get(
 	"/admin/roles",
-	accessControlMiddleware(AccessControls.ROLE_LIST),
+	[authMiddleware, accessControlMiddleware(AccessControls.ROLE_LIST)],
 	(_req: Request, res: Response, next) => {
 		accessControlManagementController.getAllRoles(res).catch(e => next(e));
 	}
@@ -45,8 +52,11 @@ router.get(
 
 router.put(
 	"/admin/roles/:id",
-	validate(updateRoleRules),
-	accessControlMiddleware(AccessControls.ROLE_UPDATE),
+	[
+		validate(updateRoleRules),
+		authMiddleware,
+		accessControlMiddleware(AccessControls.ROLE_UPDATE)
+	],
 	(req: Request, res: Response, next) => {
 		accessControlManagementController.updateRole(req, res).catch(e => next(e));
 	}
@@ -54,8 +64,11 @@ router.put(
 
 router.delete(
 	"/admin/roles/:id",
-	validate(deleteRoleRules),
-	accessControlMiddleware(AccessControls.ROLE_DELETION),
+	[
+		validate(deleteRoleRules),
+		authMiddleware,
+		accessControlMiddleware(AccessControls.ROLE_DELETION),
+	],
 	(req: Request, res: Response, next) => {
 		accessControlManagementController.deleteRole(req, res).catch(e => next(e));
 	}

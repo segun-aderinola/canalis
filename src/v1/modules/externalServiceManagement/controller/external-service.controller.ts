@@ -12,13 +12,14 @@ class ExternalServiceController {
 			search: (req.query.search as string) || "",
 			page: parseInt(req.query.page as string) || 1,
 			perPage: parseInt(req.query.perPage as string) || 10,
+			accessToken: (req as any).accessToken,
 		});
 
 		res.send(SuccessResponse("Operation successful", { response }));
 	};
 
 	getProductById = async (req: Request, res: Response) => {
-		const response = await this.externalService.getSingleProduct(req.params.id);
+		const response = await this.externalService.getSingleProduct(req.params.id, (req as any).accessToken);
 
 		res.send(SuccessResponse("Operation successful", response));
 	};
@@ -43,12 +44,13 @@ class ExternalServiceController {
 			customerEmail: req.body.customerEmail,
 			notes: req.body.notes,
 			brokerId: req.body.brokerId,
-			relationshipManagerId: req.body.user.id,
+			relationshipManagerId: req.body.user.userId,
 			relationshipManagerName: req.body.user.name,
 			relationshipManagerPhoneNumber: req.body.user.phoneNumber,
 			brokerName: req.body.brokerName,
 			brokerPhoneNumber: req.body.brokerPhoneNumber,
 			covers: req.body.covers,
+			accessToken: (req as any).accessToken,
 		});
 		res.send(SuccessResponse("Operation successful", response));
 	};
@@ -90,6 +92,7 @@ class ExternalServiceController {
 			quotationNumber: (req.query.quotationNumber as string) || "",
 			page: parseInt(req.query.page as string) || 1,
 			perPage: parseInt(req.query.perPage as string) || 10,
+			accessToken: (req as any).accessToken,
 		});
 
 		res.send(SuccessResponse("Operation successful", response));
@@ -98,6 +101,7 @@ class ExternalServiceController {
 	getQuoteById = async (req: Request, res: Response) => {
 		const response = await this.externalService.getQuoteById({
 			id: req.params.id,
+			accessToken: (req as any).accessToken,
 		});
 
 		res.send(SuccessResponse("Operation successful", response));
@@ -106,6 +110,7 @@ class ExternalServiceController {
 	getQuoteHistoryById = async (req: Request, res: Response) => {
 		const response = await this.externalService.getQuoteHistoryById({
 			id: req.params.id,
+			accessToken: (req as any).accessToken,
 		});
 
 		res.send(SuccessResponse("Operation successful", response));

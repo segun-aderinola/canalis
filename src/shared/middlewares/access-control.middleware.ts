@@ -9,10 +9,10 @@ const accessControlMiddleware = (requiredPermission: string) => {
 	return async (req: Request, res: Response, next: NextFunction) => {
 		try {
 			const roleRepo = new RoleRepo();
-			const userRole: string = (req as any).user.role;
+			const userRoleId: string = (req as any).user.role;
 
 			const roleWithPermissions: any = await roleRepo.findByNameWithRelations(
-				userRole,
+				userRoleId,
 				["permissions"]
 			);
 
