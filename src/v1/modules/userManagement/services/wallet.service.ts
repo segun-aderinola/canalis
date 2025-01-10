@@ -20,7 +20,7 @@ class WalletService {
       let config = {
         method: "post",
         maxBodyLength: Infinity,
-        url: this.paymentBaseURL + "/v1/payments/virtual-accounts",
+        url: this.paymentBaseURL + "/payments/virtual-accounts",
         headers: {
           "Content-Type": "application/json",
         },
@@ -56,7 +56,7 @@ class WalletService {
       maxBodyLength: Infinity,
       url:
         this.paymentBaseURL +
-        "/v1/payments/virtual-accounts/" +
+        "/payments/virtual-accounts/" +
         wallet?.accountNumber,
       headers: {
         "Content-Type": "application/json",
