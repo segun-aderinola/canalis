@@ -4,16 +4,20 @@ import UserController from "../controller/user.controller";
 import { createUserRules } from "../validations/create-user.validator";
 import { profilePictureUploadRules } from "../validations/profile-picture.validator";
 import { uploadBulkUserRules } from "../validations/create-bulk-user.validator";
-import {validate, validateArray} from "@shared/middlewares/validator.middleware";
+import {
+  validate,
+  validateArray,
+} from "@shared/middlewares/validator.middleware";
 import { updateUserRules } from "../validations/update-user.validator";
 import { signatureUploadRules } from "../validations/signature.validator";
 import accessControlMiddleware from "@shared/middlewares/access-control.middleware";
 import { AccessControls } from "../../accessControlManagement/enums/access-control.enum";
 import authMiddleware from "@shared/middlewares/auth.middleware";
 
-
+import { getSingleUserRules } from "../validations/get-single-user.validator";
 const userController = container.resolve(UserController);
 const router = express.Router();
+
 
 router.post("/admin/create-user", [validate(createUserRules), authMiddleware, accessControlMiddleware(AccessControls.USER_ONBOARDING)], (req: Request, res: Response, next) => userController.createUser(req, res).catch((err)=> next(err) )
 );
@@ -46,4 +50,17 @@ router.post("/dashboard/upload-signature", [authMiddleware, accessControlMiddlew
 
 router.post("/dashboard/upload-profile-pic", [authMiddleware, accessControlMiddleware(AccessControls.USER_PROFILE_UPDATE), validate(profilePictureUploadRules)], (req: Request, res: Response, next) => userController.profilePictureUpload(req, res).catch((err)=> next(err) )
 );
+
+router.get(
+  "/admin/user/:id",
+  [
+    authMiddleware,
+    accessControlMiddleware(AccessControls.USER_LIST),
+    validate(getSingleUserRules),
+  ],
+  (req: Request, res: Response, next) => {
+    userController.getUser(req, res).catch((e) => next(e));
+  }
+);
+
 export default router;

@@ -10,7 +10,7 @@ export type CreateUser = {
   isDefaultPassword?: boolean;
   idType?: string;
   idNumber?: string;
-  roleId: string;
+  role: string;
   supervisorId?: string;
   region: string;
   signature?: string

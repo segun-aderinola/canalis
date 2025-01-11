@@ -111,6 +111,18 @@ class UserManagementController {
         .status(httpStatus.CREATED)
         .send(SuccessResponse("Profile Picture uploaded successfully", role));
 };
+
+getUser = async (req: Request, res: Response) => {
+    const response = await this.userService.getUser(
+      req.params.id
+    );
+
+    return res
+      .status(httpStatus.CREATED)
+      .send(SuccessResponse("Operation successful", response));
+  };
+
+
 }
 
 export default UserManagementController;

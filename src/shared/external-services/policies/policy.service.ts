@@ -6,7 +6,7 @@ export const createPolicy = async (data: IPolicy) => {
     let config = {
       method: "post",
       maxBodyLength: Infinity,
-      url: `${appConfig.api_gateway.base_url}/v1/general/policies/direct`,
+      url: `${appConfig.api_gateway.base_url}/general/policies/direct`,
       headers: {
         "Content-Type": "application/json",
         "x-secret-key": appConfig.api_gateway.secret_key,
@@ -25,7 +25,7 @@ export const createPolicy = async (data: IPolicy) => {
     let config = {
       method: "get",
       maxBodyLength: Infinity,
-      url: `${appConfig.api_gateway.base_url}/v1/general/policies`,
+      url: `${appConfig.api_gateway.base_url}/general/policies`,
       headers: {
         "Content-Type": "application/json",
         "x-secret-key": appConfig.api_gateway.secret_key,

@@ -91,21 +91,16 @@ class UserService {
 
   
   private async validateSupervisor(supervisorId: string) {
-    const supervisorFilter: ObjectLiteral = {};
-
-    if (isValidUUID(supervisorId)) {
-      supervisorFilter.id = supervisorId;
-    } else {
+    
+    if (!isValidUUID(supervisorId)) {
       throw new AppError(400, "Invalid supervisorId UUID format.");
     }
-
-    return await this.userRepository.findOrWhere(supervisorFilter, undefined, {
-      roleId: "supervisor",
-    });
+    return await this.userRepository.findOrWhereQuery({ id: supervisorId, role: ["supervisor", "super_admin"] });
   }
 
   private async createUserRecord(data: CreateUser) {
     try {
+      
       const user = UserFactory.createUser(data);
       const createdUser = await this.userRepository.save(user);
       await walletCreationQueue.add(
@@ -299,7 +294,7 @@ class UserService {
   ): Promise<Map<string, any>> {
     const supervisors = await this.userRepository.findByIdsAndRole(
       supervisorIds,
-      "supervisor"
+      ["supervisor", "super_admin"]
     );
     return new Map(
       supervisors.map((supervisor) => [supervisor.id, supervisor])
@@ -313,7 +308,7 @@ class UserService {
       password: password,
       email: user.email,
       address: user.address,
-      roleId: user.roleId,
+      role: user.role,
       supervisorId: user.supervisorId,
       region: user.region,
     };
@@ -341,7 +336,7 @@ class UserService {
     const { page = 1, limit = 10, role, status } = req.query;
 
     const filters: Record<string, any> = {};
-    if (role) filters.roleId = role;
+    if (role) filters.role = role;
     if (status) filters.status = status;
 
     const pageSize = parseInt(limit, 10) || 10;
@@ -407,7 +402,7 @@ class UserService {
     const { role, status, page = 1, limit = 10 } = req.query;
 
     const filters: any = {};
-    if (role) filters.roleId = role;
+    if (role) filters.role = role;
     if (status) filters.status = status;
 
     const pageSize = parseInt(limit, 10) || 10;
@@ -438,7 +433,7 @@ class UserService {
           name: user.name,
           email: user.email,
           phone_number: user.phoneNumber,
-          role: user.roleId,
+          role: user.role,
           status: user.status,
           account_number: wallet?.accountNumber || "N/A",
           wallet_id: wallet?.walletId || "N/A",
@@ -479,7 +474,7 @@ class UserService {
         avatar: user.avatar ?? "",
         email: user.email ?? "",
         address: user.address ?? "",
-        roleId: user.roleId ?? "",
+        role: user.role ?? "",
         supervisorId: user.supervisorId ?? "",
         region: user.region ?? "",
       },
@@ -581,7 +576,7 @@ class UserService {
       const supervisor = await this.userRepository.findOrWhere(
         supervisorFilter,
         undefined,
-        { roleId: "supervisor" }
+        { role: "supervisor" }
       );
       if (!supervisor) {
         throw new AppError(400, "Supervisor does not exist");
@@ -590,7 +585,7 @@ class UserService {
         name: data.name,
         phoneNumber: data.phoneNumber,
         address: data.address,
-        roleId: data.roleId,
+        role: data.role,
         supervisorId: data.supervisorId,
       });
       return {
@@ -645,6 +640,19 @@ async uploadProfilePicture(req: Request, res: Response) {
       throw new ServiceUnavailableError();
   }
 }
+
+async getUser(id: string) {
+  
+  const user = await this.userRepository.findById(id);
+  if (!user) {
+    throw new AppError(400, "User does not exist");
+  }
+  return {
+    ...user,
+    wallet: this.walletService.getWallet(user.id)
+  };
+}
+
 }
 
 export default UserService;

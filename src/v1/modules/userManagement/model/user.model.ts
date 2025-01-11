@@ -15,18 +15,18 @@ export class User extends Model {
   address?: string;
   avatar?: string;
   region!: string;
-  roleId!: string;
+  role!: string;
   supervisorId?: string;
   status!: string;
   isDefaultPassword!: boolean;
   signature!: string;
   
   static relationMappings = {
-    role: {
+    userRole: {
       relation: Model.BelongsToOneRelation,
       modelClass: Role,
       join: {
-        from: 'users.roleId',
+        from: 'users.role',
         to: 'roles.id',
       },
     },

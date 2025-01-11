@@ -5,7 +5,7 @@ export const createUserRules = {
     address: "required|string",
     idType: "required|string",
     idNumber: "required|string",
-    roleId: "required|string",
+    role: "required|string",
     supervisorId: "required|string",
     region: "required|string",
   };

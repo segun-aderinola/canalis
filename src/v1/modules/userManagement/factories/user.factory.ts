@@ -8,7 +8,7 @@ class UserFactory {
     user.name = data.name;
     user.email = data.email;
     user.phoneNumber = data.phoneNumber;
-    user.roleId = data.roleId;
+    user.role = data.role;
     user.supervisorId = data.supervisorId;
     user.password = data.password;
     user.address = data.address;
