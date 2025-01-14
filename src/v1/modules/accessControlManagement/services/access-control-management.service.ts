@@ -30,7 +30,7 @@ class AccessControlManagementService {
 		const relationsData = RolePermissionFactory.createRolePermissionDto(data);
 
 		const savedRole = await this.roleRepo
-			.saveWithRelations(roleData, relationsData, "role_permissions", "roleId")
+			.saveWithRelations(roleData, relationsData.permissions, "role_permissions", "roleId")
 			.catch((error) => {
 				logger.error(`Error creating role: ${error.message}`);
 				throw new ServiceUnavailableError();
