@@ -65,7 +65,6 @@ export class BaseRepository<T, M extends Model> {
 		return await this.model.query().findOne({ name });
 	}
 
-	
 	async findByNameWithRelations(slug: string, relations: string[] = []) {
 		const query = this.model.query().findOne({ slug });
 
@@ -107,17 +106,17 @@ export class BaseRepository<T, M extends Model> {
 					.insert(data)
 					.returning("*");
 
-				if (relationsData[relationTable]) {
-					const relatedData = relationsData[relationTable] ? relationsData[relationTable].map((item: any) => ({
-						...item,
+				if (relationsData && relationTable && foreignKey) {
+					const relatedData = relationsData.map((relation: any) => ({
+						...relation,
 						[foreignKey]: savedRecord.id,
-					})) : [];
+					}));
 
-					await this.model
-						.knexQuery()
-						.table(relationTable)
-						.insert(relatedData)
-						.transacting(trx || transaction);
+						await this.model
+							.knexQuery()
+							.table(relationTable)
+							.insert(relatedData)
+							.transacting(trx || transaction);
 				}
 
 				return savedRecord;

@@ -24,3 +24,5 @@ dist
 *.key
 package-lock.json
 .env
+
+run-db-migration.sh
