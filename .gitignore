@@ -24,3 +24,4 @@ dist
 *.key
 package-lock.json
 .env
+.dump.rdb

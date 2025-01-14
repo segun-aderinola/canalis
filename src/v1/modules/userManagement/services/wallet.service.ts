@@ -4,10 +4,10 @@ import logger from "@shared/utils/logger";
 import WalletRepository from "../repositories/wallet.repository";
 import { IUser } from "../model/user.model";
 import AppError from "@shared/error/app.error";
+import appConfig from "@config/app.config";
 
 @injectable()
 class WalletService {
-  private paymentBaseURL = process.env.PAYMENT_BASE_URL;
   constructor(private readonly walletRepository: WalletRepository) {}
 
   async createWallet(user: IUser) {
@@ -20,9 +20,10 @@ class WalletService {
       let config = {
         method: "post",
         maxBodyLength: Infinity,
-        url: this.paymentBaseURL + "/v1/payments/virtual-accounts",
+        url: `${appConfig.finance.base_url}/payments/virtual-accounts`,
         headers: {
           "Content-Type": "application/json",
+				  "x-secret-key": appConfig.api_gateway.secret_key,
         },
         data: data,
       };
@@ -55,9 +56,7 @@ class WalletService {
       method: "get",
       maxBodyLength: Infinity,
       url:
-        this.paymentBaseURL +
-        "/v1/payments/virtual-accounts/" +
-        wallet?.accountNumber,
+      `${appConfig.finance.base_url}/payments/virtual-accounts/${wallet?.accountNumber}`,
       headers: {
         "Content-Type": "application/json",
       },

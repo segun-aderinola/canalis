@@ -65,10 +65,12 @@ export class BaseRepository<T, M extends Model> {
     return this.model.query().whereIn('email', emails);
   }
 
-  async findByIdsAndRole(ids: string[], role: string): Promise<any[]> {
+  async findByIdsAndRole(ids: string[], roles: string[]): Promise<any[]> {
     return this.model.query()
       .whereIn('id', ids)
-      .andWhere('roleId', role);
+      .andWhere((builder) => {
+        builder.whereIn('role', roles);
+      });
   }
 
   async saveMany(users: any[]): Promise<any[]> {
@@ -105,6 +107,45 @@ export class BaseRepository<T, M extends Model> {
           query.andWhere(key, andFilter[key]);
         }
       }
+    }
+  
+    return await query.first();
+  }
+  async findOrWhereQuery(
+    filter: ObjectLiteral,
+    orFilter?: ObjectLiteral,
+    andFilter?: ObjectLiteral
+  ): Promise<T | undefined> {
+    const query = this.model.query();
+  
+    query.where((builder) => {
+      for (const key in filter) {
+        if (Array.isArray(filter[key])) {
+          builder.whereIn(key, filter[key]);
+        } else {
+          builder.where(key, filter[key]);
+        }
+      }
+    });
+  
+    if (orFilter) {
+      query.orWhere((builder) => {
+        for (const key in orFilter) {
+          if (Object.prototype.hasOwnProperty.call(orFilter, key)) {
+            builder.orWhere(key, orFilter[key]);
+          }
+        }
+      });
+    }
+  
+    if (andFilter) {
+      query.andWhere((builder) => {
+        for (const key in andFilter) {
+          if (Object.prototype.hasOwnProperty.call(andFilter, key)) {
+            builder.andWhere(key, andFilter[key]);
+          }
+        }
+      });
     }
   
     return await query.first();
