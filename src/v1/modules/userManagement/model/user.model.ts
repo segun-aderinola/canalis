@@ -22,6 +22,7 @@ export class User extends Model {
   status!: string;
   isDefaultPassword!: boolean;
   signature!: string;
+  transactionPin!: string;
   
   static relationMappings = {
     userRole: {
@@ -38,11 +39,17 @@ export class User extends Model {
     if (this.password) {
       this.password = await bcrypt.hash(this.password, SALT_ROUNDS);
     }
+    if (this.transactionPin) {
+      this.transactionPin = await bcrypt.hash(this.transactionPin, SALT_ROUNDS);
+    }
   }
 
   async $beforeUpdate(): Promise<void> {
     if (this.password) {
       this.password = await bcrypt.hash(this.password, SALT_ROUNDS);
+    }
+    if (this.transactionPin) {
+      this.transactionPin = await bcrypt.hash(this.transactionPin, SALT_ROUNDS);
     }
   }
 

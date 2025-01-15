@@ -50,5 +50,7 @@ router.post("/policy/callback", validate(policyCallbackValidationRules), (req: R
   policyController.creationCallback(req, res);
 });
 
-
+router.get("/policy/:id", authMiddleware, (req: Request, res: Response) => {
+  policyController.getSinglePolicy(req, res);
+});
 export default router;

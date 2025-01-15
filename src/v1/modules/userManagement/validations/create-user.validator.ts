@@ -8,7 +8,7 @@ export const createUserRules = {
     idType: "required|string",
     idNumber: "required|string",
     role: "required|string",
-    supervisorId: "required|string",
+    supervisorId: "required|uuid",
     region: "required|string",
   };
   
