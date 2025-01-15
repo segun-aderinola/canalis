@@ -32,7 +32,7 @@ class OTPService {
         });
       
       const mail = {
-        name: data.user?.name,
+        name: data.user?.firstName,
         email: data.user.email,
         subject: "Password Reset Notification",
         otp: data.token,

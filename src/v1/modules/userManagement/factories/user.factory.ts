@@ -5,7 +5,9 @@ class UserFactory {
   static createUser(data: CreateUser) {
     const user = {} as IUser;
 
-    user.name = data.name;
+    user.firstName = data.firstName;
+    user.lastName = data.lastName;
+    user.middleName = data.middleName;
     user.email = data.email;
     user.phoneNumber = data.phoneNumber;
     user.role = data.role;

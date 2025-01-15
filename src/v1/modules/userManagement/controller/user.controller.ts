@@ -122,6 +122,16 @@ getUser = async (req: Request, res: Response) => {
       .send(SuccessResponse("Operation successful", response));
   };
 
+  deleteUser = async (req: Request, res: Response) => {
+    const response = await this.userService.deleteUser(
+      req
+    );
+
+    return res
+      .status(httpStatus.OK)
+      .send(SuccessResponse("Operation successful", response));
+  };
+
 
 }
 

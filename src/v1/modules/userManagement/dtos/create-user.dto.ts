@@ -1,6 +1,8 @@
 
 export type CreateUser = {
-  name: string;
+  firstName: string;
+  lastName: string;
+  middleName: string;
   email: string;
   phoneNumber: string;
   password: string;

@@ -13,7 +13,7 @@ class WalletService {
   async createWallet(user: IUser) {
     try {
       let data = JSON.stringify({
-        accountName: user.name,
+        accountName: user.firstName+" "+user.lastName,
         autoPayoutEnabled: true,
       });
 
@@ -50,33 +50,19 @@ class WalletService {
   }
 
   async getWallet(userId: string) {
-    const wallet = await this.walletRepository.findOne({ userId });
-
-    let config = {
-      method: "get",
-      maxBodyLength: Infinity,
-      url:
-      `${appConfig.finance.base_url}/payments/virtual-accounts/${wallet?.accountNumber}`,
-      headers: {
-        "Content-Type": "application/json",
-      },
-    };
-
     try {
-      const response = await axios.request(config);
-      if (response.data.status) {
+      const wallet = await this.walletRepository.findOne({ userId });
+      if (wallet){
         return {
-          accountNumber: response.data.data.accountNumber,
-          status: response.data.data.status,
-          accountName: response.data.data.accountName,
-          autoPayoutEnabled: response.data.data.autoPayoutEnabled,
+          accountNumber: wallet.accountNumber,
+          balance: wallet.balance,
+          walletId: wallet.walletId,
         };
       }
       return {
         accountNumber: "",
-        status: "",
-        accountName: "",
-        autoPayoutEnabled: "",
+        balance: 0.00,
+        walletId: "",
       };
     } catch (error: any) {
       logger.error({ error: error.message }, "Error fetching wallet");

@@ -25,5 +25,4 @@ dist
 package-lock.json
 .env
 .dump.rdb
-
 run-db-migration.sh

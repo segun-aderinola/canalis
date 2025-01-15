@@ -8,7 +8,9 @@ const SALT_ROUNDS = 10;
 export class User extends Model {
   static tableName = DB_TABLES.USERS;
   id!: string;
-  name!: string;
+  firstName!: string;
+  lastName!: string;
+  middleName!: string;
   email!: string;
   password!: string;
   phoneNumber!: string;

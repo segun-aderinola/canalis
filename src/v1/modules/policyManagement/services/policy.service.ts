@@ -150,7 +150,7 @@ class PolicyService {
     const user = await this.userRepository.findById(policy.supervisorId);
     const data = {
       subject: "Policy Creation",
-      name: user.name,
+      name: user.firstName,
       email: user.email,
     };
     try {
@@ -170,7 +170,7 @@ class PolicyService {
     }
     const data = {
       subject: "Policy Rejected",
-      name: user.name,
+      name: user.firstName,
       email: user.email,
     };
     try {

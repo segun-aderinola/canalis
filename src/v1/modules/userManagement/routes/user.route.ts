@@ -15,6 +15,7 @@ import { AccessControls } from "../../accessControlManagement/enums/access-contr
 import authMiddleware from "@shared/middlewares/auth.middleware";
 
 import { getSingleUserRules } from "../validations/get-single-user.validator";
+import { reasonRules } from "../validations/reason.validator";
 const userController = container.resolve(UserController);
 const router = express.Router();
 
@@ -38,7 +39,7 @@ router.post("/admin/reactivate-user/:id", [authMiddleware, accessControlMiddlewa
   userController.reactiveUserAccount(req, res);
 });
 
-router.post("/admin/deactivate-user/:id", [authMiddleware, accessControlMiddleware(AccessControls.USER_ACCOUNT_DEACTIVATION)], (req: Request, res: Response) => {
+router.post("/admin/deactivate-user/:id", [authMiddleware, validate(reasonRules), accessControlMiddleware(AccessControls.USER_ACCOUNT_DEACTIVATION)], (req: Request, res: Response) => {
   userController.deactiveUserAccount(req, res);
 });
 
@@ -60,6 +61,18 @@ router.get(
   ],
   (req: Request, res: Response, next) => {
     userController.getUser(req, res).catch((e) => next(e));
+  }
+);
+
+router.delete(
+  "/admin/user/:id",
+  [
+    authMiddleware,
+    accessControlMiddleware(AccessControls.USER_LIST),
+    validate(reasonRules),
+  ],
+  (req: Request, res: Response, next) => {
+    userController.deleteUser(req, res).catch((e) => next(e));
   }
 );
 

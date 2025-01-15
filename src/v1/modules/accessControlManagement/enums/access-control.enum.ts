@@ -19,4 +19,5 @@ export enum AccessControls {
 	PRODUCT_LIST = "product_list",
 	QUOTE_CREATION = "quotes_creation",
 	QUOTE_LIST = "quotes_list",
+	DELETE_USER = "delete_user",
 }
