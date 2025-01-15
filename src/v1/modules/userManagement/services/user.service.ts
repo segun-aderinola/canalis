@@ -19,7 +19,8 @@ import walletCreationQueue from "../queues/wallet-creation.queue";
 import WalletService from "./wallet.service";
 import WalletRepository from "../repositories/wallet.repository";
 import AppError from "@shared/error/app.error";
-
+import IdVerificationRepository from "../repositories/id_verification.repository";
+import ActionReasonFactory from "../factories/action_reason.factory";
 
 @injectable()
 class UserService {
@@ -27,7 +28,8 @@ class UserService {
     private readonly userRepository: UserRepository,
     private readonly mailService: MailService,
     private readonly walletService: WalletService,
-    private readonly walletRepository: WalletRepository
+    private readonly walletRepository: WalletRepository,
+    private readonly idVerificationRepository: IdVerificationRepository
   ) {}
 
   async createUser(data: CreateUser) {
@@ -59,9 +61,10 @@ class UserService {
       };
     } catch (error: any) {
       logger.error({ error: error.message }, "Error creating user");
-      throw new AppError(400, error.message ||
-          "An unexpected error occurred while creating the user");
-
+      throw new AppError(
+        400,
+        error.message || "An unexpected error occurred while creating the user"
+      );
     }
   }
 
@@ -89,23 +92,29 @@ class UserService {
     return { success: true };
   }
 
-  
   private async validateSupervisor(supervisorId: string) {
-    
     if (!isValidUUID(supervisorId)) {
       throw new AppError(400, "Invalid supervisorId UUID format.");
     }
-    return await this.userRepository.findOrWhereQuery({ id: supervisorId, role: ["supervisor", "super_admin"] });
+    return await this.userRepository.findOrWhereQuery({
+      id: supervisorId,
+      role: ["supervisor", "super_admin"],
+    });
   }
 
   private async createUserRecord(data: CreateUser) {
     try {
-      
       const user = UserFactory.createUser(data);
       const createdUser = await this.userRepository.save(user);
       await walletCreationQueue.add(
         { user: createdUser },
-        { attempts: Number(process.env.QUEUE_ATTEMPTS) || 3, backoff: { type: "exponential", delay: Number(process.env.QUEUE_DELAY) || 5000 } },
+        {
+          attempts: Number(process.env.QUEUE_ATTEMPTS) || 3,
+          backoff: {
+            type: "exponential",
+            delay: Number(process.env.QUEUE_DELAY) || 5000,
+          },
+        }
       );
       return { success: true, data: createdUser };
     } catch (error: any) {
@@ -136,7 +145,10 @@ class UserService {
         data: { user },
         opts: {
           attempts: Number(process.env.QUEUE_ATTEMPTS) || 3,
-          backoff: { type: "exponential", delay: Number(process.env.QUEUE_DELAY) || 5000 },
+          backoff: {
+            type: "exponential",
+            delay: Number(process.env.QUEUE_DELAY) || 5000,
+          },
         },
       }));
 
@@ -163,7 +175,6 @@ class UserService {
     } catch (error: any) {
       logger.error({ error: error.message }, "Error sending email");
       throw new AppError(400, "Failed to send account creation email.");
-
     }
   }
 
@@ -303,7 +314,9 @@ class UserService {
 
   private createUserData(user: any, password: string) {
     return {
-      name: user.name,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      middleName: user.middleName,
       phoneNumber: user.phoneNumber,
       password: password,
       email: user.email,
@@ -333,11 +346,13 @@ class UserService {
   }
 
   async getAllUsers(req: any) {
-    const { page = 1, limit = 10, role, status } = req.query;
+    const { page = 1, limit = 10, role, status, region, phoneNumber } = req.query;
 
     const filters: Record<string, any> = {};
     if (role) filters.role = role;
     if (status) filters.status = status;
+    if (region) filters.region = region;
+    if (phoneNumber) filters.phoneNumber = phoneNumber;
 
     const pageSize = parseInt(limit, 10) || 10;
     const currentPage = parseInt(page, 10) || 1;
@@ -371,16 +386,28 @@ class UserService {
         wallets.map((wallet) => [wallet.userId, wallet])
       );
 
-      const usersWithWalletDetails = users.map((user) => {
+      const usersWithWalletDetails = users.map(async (user) => {
         const wallet = walletMap.get(user.id);
+        const supervisor = await this.userRepository.findById(
+          user.supervisorId as string
+        );
+        const means_of_id = await this.idVerificationRepository.findOneWhere({
+          userId: user.id,
+        });
         return {
           ...user,
+          supervisor: {
+            firstName: supervisor.firstName,
+            lastName: supervisor.lastName,
+            middlename: supervisor.middleName,
+          },
           wallet_details: wallet
             ? {
                 accountNumber: wallet.accountNumber,
                 walletId: wallet.walletId,
               }
             : null,
+          means_of_id: means_of_id ?? {},
         };
       });
 
@@ -430,7 +457,9 @@ class UserService {
       const all_users = users.map((user) => {
         const wallet = walletMap.get(user.id);
         return {
-          name: user.name,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          middleName: user.middleName,
           email: user.email,
           phone_number: user.phoneNumber,
           role: user.role,
@@ -467,15 +496,28 @@ class UserService {
 
   async getProfile(req: any) {
     const user = await this.userRepository.findById(req.user.id);
+    const supervisor = await this.userRepository.findById(
+      user.supervisorId as string
+    );
+    const means_of_id = await this.idVerificationRepository.findOneWhere({
+      userId: user.id,
+    });
     return {
       user: {
-        name: user.name ?? "",
+        firstName: user.firstName ?? "",
+        lastName: user.lastName ?? "",
+        middleName: user.middleName ?? "",
         phoneNumber: user.phoneNumber ?? "",
         avatar: user.avatar ?? "",
         email: user.email ?? "",
         address: user.address ?? "",
         role: user.role ?? "",
-        supervisorId: user.supervisorId ?? "",
+        supervisor: {
+          firstName: supervisor.firstName,
+          lastName: supervisor.lastName,
+          middlename: supervisor.middleName,
+        },
+        means_of_id: means_of_id ?? {},
         region: user.region ?? "",
       },
       wallet: await this.walletService.getWallet(user.id),
@@ -498,7 +540,12 @@ class UserService {
       const updatedUser = await this.userRepository.updateById(id, {
         status: "inactive",
       });
-
+      const data = {
+        userId: user.id,
+        action: "deactivate-user",
+        reason: req.body.reason
+      }
+      if(req.body.reason) await this.createReason(data);
       return {
         success: true,
         message: "User account deactivated successfully",
@@ -526,7 +573,7 @@ class UserService {
 
     const mail = {
       subject: "Account Reactivated",
-      name: user.name,
+      name: user.firstName + " " + user.lastName,
       email: user.email.toLowerCase(),
       password: password,
       link: process.env.FRONTEND_BASEURL + "/login",
@@ -551,7 +598,7 @@ class UserService {
       };
     } catch (error: any) {
       logger.error({ error: error.message }, "Error deactivating user");
-      throw new AppError(400, "Failed to activate user account");      
+      throw new AppError(400, "Failed to activate user account");
     }
   }
 
@@ -582,7 +629,9 @@ class UserService {
         throw new AppError(400, "Supervisor does not exist");
       }
       await this.userRepository.updateById(req.params.id, {
-        name: data.name,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        middleName: data.middleName,
         phoneNumber: data.phoneNumber,
         address: data.address,
         role: data.role,
@@ -598,61 +647,104 @@ class UserService {
     }
   }
 
-
-async uploadSignature(req: Request, res: Response) {
-  try {
+  async uploadSignature(req: Request, res: Response) {
+    try {
       const user = await this.userRepository.findById(req.user.userId);
 
-      if (!user){
+      if (!user) {
         return res
-        .status(httpStatus.CONFLICT)
-        .send(ErrorResponse("User does not exists"));
+          .status(httpStatus.CONFLICT)
+          .send(ErrorResponse("User does not exists"));
       }
       await this.userRepository.updateById(user.id, {
         signature: req.body.signature,
       });
       return res
-          .status(httpStatus.OK)
-          .send(SuccessResponse("Signature uploaded successfully"));
-  } catch (error: any) {
+        .status(httpStatus.OK)
+        .send(SuccessResponse("Signature uploaded successfully"));
+    } catch (error: any) {
       logger.error(`Error uploading signature`);
       throw new ServiceUnavailableError();
+    }
   }
-}
 
-async uploadProfilePicture(req: Request, res: Response) {
-  try {
+  async uploadProfilePicture(req: Request, res: Response) {
+    try {
       const user = await this.userRepository.findById(req.user.userId);
 
-      if (!user){
+      if (!user) {
         return res
-        .status(httpStatus.CONFLICT)
-        .send(ErrorResponse("User does not exists"));
+          .status(httpStatus.CONFLICT)
+          .send(ErrorResponse("User does not exists"));
       }
       await this.userRepository.updateById(user.id, {
-        avatar: req.body.avatar
+        avatar: req.body.avatar,
       });
       return res
-          .status(httpStatus.OK)
-          .send(SuccessResponse("Profile Picture uploaded successfully"));
-  } catch (error: any) {
+        .status(httpStatus.OK)
+        .send(SuccessResponse("Profile Picture uploaded successfully"));
+    } catch (error: any) {
       logger.error({ error: error.message }, "Error uploading profile picture");
       throw new ServiceUnavailableError();
+    }
   }
-}
 
-async getUser(id: string) {
-  
-  const user = await this.userRepository.findById(id);
-  if (!user) {
-    throw new AppError(400, "User does not exist");
+  async getUser(id: string) {
+    const user = await this.userRepository.findById(id);
+    if (!user) {
+      throw new AppError(400, "User does not exist");
+    }
+    const supervisor = await this.userRepository.findById(
+      user.supervisorId as string
+    );
+    const means_of_id = await this.idVerificationRepository.findOneWhere({
+      userId: user.id,
+    });
+
+    return {
+      ...user,
+      supervisor: {
+        firstName: supervisor.firstName,
+        lastName: supervisor.lastName,
+        middlename: supervisor.middleName,
+      },
+      wallet: this.walletService.getWallet(user.id),
+      means_of_id: means_of_id ?? {},
+    };
   }
-  return {
-    ...user,
-    wallet: this.walletService.getWallet(user.id)
-  };
-}
 
+  async deleteUser(req: Request) {
+    const id = req.params.id;
+    const user = await this.userRepository.findById(id);
+    if (!user) {
+      throw new AppError(400, "User does not exist");
+    }
+
+    const wallet = await this.walletRepository.findOneWhere({
+      userId: user.id,
+    });
+
+    if (!wallet || wallet.balance > 0) {
+      throw new AppError(
+        400,
+        "User cannot be deleted because their wallet has a balance"
+      );
+    }
+    await this.userRepository.deleteById(user.id);
+    const data = {
+      userId: user.id,
+      action: "delete-user",
+      reason: req.body.reason
+    }
+    if(req.body.reason) await this.createReason(data);
+    return { message: "User deleted successfully" };
+  }
+
+
+  async createReason(data: any) {
+    const reason = ActionReasonFactory.createReason(data);
+    await this.userRepository.save(reason);
+  }
 }
 
 export default UserService;

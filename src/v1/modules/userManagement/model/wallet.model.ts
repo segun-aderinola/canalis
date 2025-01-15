@@ -7,6 +7,7 @@ export class Wallet extends Model {
   userId!: string;
   walletId!: string;
   accountNumber!: string;
+  balance!: number
 }
 
 export type IWallet = ModelObject<Wallet>;
