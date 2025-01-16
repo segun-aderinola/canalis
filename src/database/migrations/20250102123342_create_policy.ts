@@ -10,7 +10,7 @@ export async function up(knex: Knex): Promise<void> {
     table.string("customerId").notNullable();
     table.string("productId").notNullable();
     table.string("customerType").notNullable();
-    table.string("businessType").notNullable().defaultTo('Direct');;
+    table.string("businessType").notNullable().defaultTo('Direct');
     table.string("startDate").notNullable();
     table.string("endDate").notNullable();
     table.string("brokerId").nullable();
