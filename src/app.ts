@@ -1,7 +1,6 @@
 import "reflect-metadata";
 import "dotenv/config";
 import "module-alias/register";
-
 import express from "express";
 import http from "http";
 import {
@@ -16,12 +15,7 @@ import { BullAdapter } from 'bull-board/bullAdapter';
 import { createBullBoard } from 'bull-board';
 import walletCreationQueue from "./v1/modules/userManagement/queues/wallet-creation.queue";
 
-
-
 class App {
-	// use(arg0: any) {
-	//   throw new Error("Method not implemented.");
-	// }
 	private app: express.Application;
 	private server: http.Server;
 
@@ -44,6 +38,7 @@ class App {
 		this.app.use(RouteVersion.v1, routes.externalService);
 		this.app.use(RouteVersion.v1, routes.accessControl);
 		this.app.use(RouteVersion.v1, routes.policyManagement);
+		this.app.use(RouteVersion.v1, routes.walletManagement);
 	}
 
 	private registerBullBoard() {

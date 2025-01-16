@@ -11,5 +11,6 @@ export enum DB_TABLES {
 	ROLE_PERMISSIONS = "role_permissions",
 	POLICIES = "policies",
 	NOTIFICATIONS = "notifications",
+	TRANSACTIONS = "transactions",
 	ACTION_REASONS = "action_reasons",
 }

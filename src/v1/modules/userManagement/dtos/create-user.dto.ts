@@ -14,6 +14,7 @@ export type CreateUser = {
   idNumber?: string;
   role: string;
   supervisorId?: string;
+  transactionPin?: string;
   region: string;
   signature?: string
   createdAt?: Date;

@@ -112,6 +112,21 @@ class UserManagementController {
         .send(SuccessResponse("Profile Picture uploaded successfully", role));
 };
 
+
+setTransactionPin = async (req: Request, res: Response) => {
+  return await this.userService.setTransactionPin(
+      req,
+      res
+  );
+};
+
+updateTransactionPin = async (req: Request, res: Response) => {
+  return await this.userService.setTransactionPin(
+      req,
+      res
+  );
+};
+
 getUser = async (req: Request, res: Response) => {
     const response = await this.userService.getUser(
       req.params.id
@@ -129,10 +144,8 @@ getUser = async (req: Request, res: Response) => {
 
     return res
       .status(httpStatus.OK)
-      .send(SuccessResponse("Operation successful", response));
+      .send(SuccessResponse(response));
   };
-
-
 }
 
 export default UserManagementController;

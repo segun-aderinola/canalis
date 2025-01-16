@@ -6,9 +6,7 @@ import UserRepository from "../repositories/user.repository";
 import {
   exportCSVData,
   generateCode,
-  isValidUUID,
 } from "@shared/utils/functions.util";
-import { ObjectLiteral } from "@shared/types/object-literal.type";
 import MailService from "./mail.service";
 import logger from "@shared/utils/logger";
 import { ErrorResponse, SuccessResponse } from "@shared/utils/response.util";
@@ -93,13 +91,9 @@ class UserService {
   }
 
   private async validateSupervisor(supervisorId: string) {
-    if (!isValidUUID(supervisorId)) {
-      throw new AppError(400, "Invalid supervisorId UUID format.");
-    }
-    return await this.userRepository.findOrWhereQuery({
-      id: supervisorId,
-      role: ["supervisor", "super_admin"],
-    });
+
+    return await this.userRepository.findOrWhereQuery({ id: supervisorId });
+
   }
 
   private async createUserRecord(data: CreateUser) {
@@ -184,11 +178,9 @@ class UserService {
   }
 
   private async getSupervisors(users: any[]): Promise<Map<string, any>> {
-    const supervisorIds = Array.from(
-      new Set(users.map((user) => user.supervisorId))
-    ).filter(isValidUUID);
+    const supervisorIds = Array.from(new Set(users.map((user) => user.supervisorId)));
     return await this.getSupervisorsMap(supervisorIds);
-  }
+  }  
 
   private processUsers(
     users: any[],
@@ -524,6 +516,11 @@ class UserService {
     };
   }
 
+
+  async userInformation(userId: string): Promise<IUser> {
+    return await this.userRepository.findById(userId);
+  };
+
   async deactivateUserAccount(req: any) {
     const id = req.params.id;
 
@@ -609,22 +606,7 @@ class UserService {
       if (!user) {
         throw new AppError(400, "User does not exist");
       }
-
-      const supervisorFilter: ObjectLiteral = {};
-
-      if (data.supervisorId.includes("@")) {
-        supervisorFilter.email = data.supervisorId;
-      } else {
-        if (!isValidUUID(data.supervisorId)) {
-          throw new AppError(400, "Invalid supervisorId UUID format");
-        }
-        supervisorFilter.id = data.supervisorId;
-      }
-      const supervisor = await this.userRepository.findOrWhere(
-        supervisorFilter,
-        undefined,
-        { role: "supervisor" }
-      );
+      const supervisor = await this.validateSupervisor(data.supervisorId);
       if (!supervisor) {
         throw new AppError(400, "Supervisor does not exist");
       }
@@ -724,7 +706,7 @@ class UserService {
       userId: user.id,
     });
 
-    if (!wallet || wallet.balance > 0) {
+    if (wallet && wallet.balance > 0) {
       throw new AppError(
         400,
         "User cannot be deleted because their wallet has a balance"
@@ -737,7 +719,7 @@ class UserService {
       reason: req.body.reason
     }
     if(req.body.reason) await this.createReason(data);
-    return { message: "User deleted successfully" };
+    return "User account deleted successfully";
   }
 
 
@@ -745,6 +727,30 @@ class UserService {
     const reason = ActionReasonFactory.createReason(data);
     await this.userRepository.save(reason);
   }
+
+async setTransactionPin(req: Request, res: Response) {
+  try {
+      const user = await this.userRepository.findById(req.user.userId);
+      if (!user){
+        return res
+          .status(httpStatus.CONFLICT)
+          .send(ErrorResponse("User does not exists"));
+      }
+      await this.userRepository.updateById(user.id, {
+
+        transactionPin: req.body.transactionPin
+      });
+      return res
+          .status(httpStatus.OK)
+          .send(SuccessResponse("Transaction Pin set successfully"));
+  } catch (error: any) {
+      logger.error({ error: error.message }, "Error setting transaction pin");
+    
+      throw new ServiceUnavailableError();
+    }
+  }
+  
+
 }
 
 export default UserService;

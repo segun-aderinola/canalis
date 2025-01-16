@@ -5,6 +5,7 @@ const appConfig = {
 	app: {
 		name: process.env.APP_NAME,
 		brand: process.env.BRAND_NAME,
+		base_url: String(process.env.APP_BASE_URL),
 		env: getEnv(),
 	},
 	server: {
@@ -43,6 +44,3 @@ const appConfig = {
 };
 
 export default appConfig;
-
-
-

@@ -6,16 +6,16 @@ import userRoute from "../../v1/modules/userManagement/routes/user.route";
 import accessControlRoute from "../../v1/modules/accessControlManagement/routes/access-control.route";
 import externalServiceRoute from "../../v1/modules/externalServiceManagement/routes/external-service.route";
 import policyRoute from "../../v1/modules/policyManagement/routes/policy.route";
-
+import walletRoute from "../../v1/modules/walletServiceManagement/routes/wallet.route";
 
 export default {
   app: appRoute,
-	health: healthRoute,
-	auditTrail: auditTrailRoute,
-	auth: authRoute,
-	userManagement: userRoute,
-	externalService: externalServiceRoute,
+  health: healthRoute,
+  auditTrail: auditTrailRoute,
+  auth: authRoute,
+  userManagement: userRoute,
+  externalService: externalServiceRoute,
   accessControl: accessControlRoute,
   policyManagement: policyRoute,
-}
-
+  walletManagement: walletRoute
+};
