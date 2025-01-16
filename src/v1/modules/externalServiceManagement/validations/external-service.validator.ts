@@ -19,8 +19,7 @@ export const generateQuoteRules = {
 	brokerId: "uuid",
 	brokerName: "string",
 	brokerPhoneNumber: "string",
-	covers: "required|array",
-	accessToken: "required|string",
+	covers: "array"
 };
 
 export const generatePaymentLinkRules = {

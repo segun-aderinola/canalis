@@ -519,7 +519,7 @@ class UserService {
 
   async userInformation(userId: string): Promise<IUser> {
     return await this.userRepository.findById(userId);
-  };
+  }
 
   async deactivateUserAccount(req: any) {
     const id = req.params.id;

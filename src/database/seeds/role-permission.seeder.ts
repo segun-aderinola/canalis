@@ -8,6 +8,8 @@ export async function seed(knex: Knex): Promise<void> {
 	await knex(DB_TABLES.ROLE_PERMISSIONS).del();
 	await knex(DB_TABLES.ROLES).del();
 	await knex(DB_TABLES.PERMISSIONS).del();
+	await knex(DB_TABLES.IDVERIFICATION).del();
+	await knex(DB_TABLES.WALLETS).del();
 
 	// Insert into permission table WITH ID
 	await knex(DB_TABLES.PERMISSIONS).insert([
@@ -290,12 +292,15 @@ export async function seed(knex: Knex): Promise<void> {
 	// Insert into users table
 	await knex(DB_TABLES.USERS).insert([
 		{
-			id: "6cd43ccb-512d-409e-8bf6-95fd0ea0d9f3",
-			name: "John Doe",
+			id: "3eac29a0-cd8b-4989-b709-7c53613ffd6a",
+			firstName: "John",
+			lastName: "Doe",
+			middleName: "",
 			email: "john.doe@example.com",
 			phoneNumber: "1234567890",
 			password: await bcrypt.hash("password", 10),
 			avatar: null,
+			transactionPin: null,
 			address: "123 Main St",
 			role: "super_admin",
 			supervisorId: "7ed43ccb-512d-409e-8bf6-95fd0ea0d9f4",
@@ -303,6 +308,95 @@ export async function seed(knex: Knex): Promise<void> {
 			isDefaultPassword: false,
 			status: "active",
 			signature: null,
+		},
+		{
+			id: "1b93d16d-efe2-4cda-b004-502cfd17853c",
+			firstName: "Manchy",
+			lastName: "Dur",
+			middleName: "Jeff",
+			email: "eduduru+1@gmail.com",
+			phoneNumber: "1234567891",
+			password: await bcrypt.hash("password", 10),
+			avatar: null,
+			transactionPin: null,
+			address: "124 Main St",
+			role: "supervisor",
+			supervisorId: "3eac29a0-cd8b-4989-b709-7c53613ffd6a",
+			region: "North",
+			isDefaultPassword: false,
+			status: "active",
+			signature: null,
+		},
+		{
+			id: "240d3d3c-0a66-4853-bf8d-256dd09680b4",
+			firstName: "Bruce",
+			lastName: "Wills",
+			middleName: "",
+			email: "bruce.wills@emple.com",
+			phoneNumber: "1234567892",
+			password: await bcrypt.hash("password", 10),
+			avatar: null,
+			transactionPin: null,
+			address: "155 Main St",
+			role: "agent",
+			supervisorId: "1b93d16d-efe2-4cda-b004-502cfd17853c",
+			region: "North",
+			isDefaultPassword: false,
+			status: "active",
+			signature: null,
+		},
+	]);
+
+	await knex(DB_TABLES.IDVERIFICATION).insert([
+		{
+			id: "44c9cd7c-5bd4-49b2-ac5e-815e7482cc6f",
+			userId: "3eac29a0-cd8b-4989-b709-7c53613ffd6a",
+			idType: "NIN",
+			idNumber: "223300445234",
+			issuingDate: "2020-01-10",
+			expiringDate: "2026-01-10",
+		},
+		{
+			id: "97e888c4-3e18-47c7-9290-be1eb5cd1811",
+			userId: "1b93d16d-efe2-4cda-b004-502cfd17853c",
+			idType: "NIN",
+			idNumber: "223300445235",
+			issuingDate: "2020-01-10",
+			expiringDate: "2026-01-10",
+		},
+		{
+			id: "fb1e8590-dc45-4563-9c0f-186447b784e9",
+			userId: "240d3d3c-0a66-4853-bf8d-256dd09680b4",
+			idType: "NIN",
+			idNumber: "223300445235",
+			issuingDate: "2020-01-10",
+			expiringDate: "2026-01-10",
+		},
+	]);
+
+	await knex(DB_TABLES.WALLETS).insert([
+		{
+			id: "72a0b827-fcc0-49cf-a853-2449a393d125",
+			userId: "3eac29a0-cd8b-4989-b709-7c53613ffd6a",
+			walletId: "NIN",
+			accountNumber: "9000027675",
+			balance: "20000",
+		},
+
+		{
+			id: "abb45bb9-81db-43b5-a3cd-9845598552c2",
+			userId: "1b93d16d-efe2-4cda-b004-502cfd17853c",
+			walletId: "NIN",
+			accountNumber: "9000027676",
+			balance: "10000",
+		},
+
+		{
+			id: "d71f2f59-cc85-4c5e-a714-9af02d6e261b",
+			userId: "240d3d3c-0a66-4853-bf8d-256dd09680b4",
+			walletId: "NIN",
+			accountNumber: "9000027677",
+			balance: "30000",
 		},
 	]);
 }

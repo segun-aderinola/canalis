@@ -12,7 +12,7 @@ export async function up(knex: Knex): Promise<void> {
 
 export async function down(knex: Knex): Promise<void> {
   return knex.schema.alterTable(DB_TABLES.USERS, (table: Knex.TableBuilder) => {
-    table.string("name").notNullable();
+    table.string("name").nullable();
     table.dropColumn("firstName");
     table.dropColumn("lastName");
     table.dropColumn("middleName");
