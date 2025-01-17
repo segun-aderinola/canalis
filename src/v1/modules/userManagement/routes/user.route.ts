@@ -17,12 +17,12 @@ import authMiddleware from "@shared/middlewares/auth.middleware";
 
 const userController = container.resolve(UserManagementController);
 import { getSingleUserRules } from "../validations/get-single-user.validator";
-import { reasonRules } from "../validations/reason.validator";
-
+import { deactivateReasonRules } from "../validations/deactivation-reason.validator";
+import { deleteReasonRules } from "../validations/delete-reason.validator";
 const router = express.Router();
 
 
-router.post("/admin/create-user", [validate(createUserRules), authMiddleware, accessControlMiddleware(AccessControls.USER_ONBOARDING)], (req: Request, res: Response, next) => userController.createUser(req, res).catch((err)=> next(err) )
+router.post("/admin/create-user", [validate(createUserRules)], (req: Request, res: Response, next) => userController.createUser(req, res).catch((err)=> next(err) )
 );
 
 router.post("/admin/upload-bulk-user", [authMiddleware, accessControlMiddleware(AccessControls.BULK_USER_ONBOARDING), validateArray(uploadBulkUserRules)], (req: Request, res: Response) => 
@@ -41,7 +41,8 @@ router.post("/admin/reactivate-user/:id", [authMiddleware, accessControlMiddlewa
   userController.reactiveUserAccount(req, res);
 });
 
-router.post("/admin/deactivate-user/:id", [authMiddleware, validate(reasonRules), accessControlMiddleware(AccessControls.USER_ACCOUNT_DEACTIVATION)], (req: Request, res: Response) => {
+
+router.post("/admin/deactivate-user/:id", [authMiddleware, validate(deactivateReasonRules), accessControlMiddleware(AccessControls.USER_ACCOUNT_DEACTIVATION)], (req: Request, res: Response) => {
   userController.deactiveUserAccount(req, res);
 });
 
@@ -77,7 +78,7 @@ router.delete(
   [
     authMiddleware,
     accessControlMiddleware(AccessControls.USER_LIST),
-    validate(reasonRules),
+    validate(deleteReasonRules),
   ],
   (req: Request, res: Response, next) => {
     userController.deleteUser(req, res).catch((e) => next(e));

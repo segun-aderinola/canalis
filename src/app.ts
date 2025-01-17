@@ -13,7 +13,8 @@ import routes from "./shared/routes/index.routes";
 import logger from "@shared/utils/logger";
 import { BullAdapter } from 'bull-board/bullAdapter';
 import { createBullBoard } from 'bull-board';
-import walletCreationQueue from "./v1/modules/userManagement/queues/wallet-creation.queue";
+import { QueueService } from "./v1/modules/userManagement/queues/wallet-creation.queue";
+import { container } from "tsyringe";
 
 class App {
 	private app: express.Application;
@@ -42,10 +43,13 @@ class App {
 	}
 
 	private registerBullBoard() {
+		const queueService = container.resolve(QueueService);
+		const walletCreationQueue = queueService.getWalletCreationQueue();
+	  
 		const { router } = createBullBoard([new BullAdapter(walletCreationQueue)]);
-
-		this.app.use("/admin/queues", router);
-	}
+	  
+		this.app.use('/admin/queues', router);
+	  }
 
 	public getInstance() {
 		return this.app;

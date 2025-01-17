@@ -13,10 +13,10 @@ import { ErrorResponse, SuccessResponse } from "@shared/utils/response.util";
 import httpStatus from "http-status";
 import ServiceUnavailableError from "@shared/error/service-unavailable.error";
 import { IUser } from "../model/user.model";
-import walletCreationQueue from "../queues/wallet-creation.queue";
 import WalletService from "./wallet.service";
 import WalletRepository from "../repositories/wallet.repository";
 import AppError from "@shared/error/app.error";
+import { QueueService } from "../queues/wallet-creation.queue";
 import IdVerificationRepository from "../repositories/id_verification.repository";
 import ActionReasonFactory from "../factories/action_reason.factory";
 
@@ -27,6 +27,7 @@ class UserService {
     private readonly mailService: MailService,
     private readonly walletService: WalletService,
     private readonly walletRepository: WalletRepository,
+    private readonly queueService: QueueService,
     private readonly idVerificationRepository: IdVerificationRepository
   ) {}
 
@@ -100,16 +101,7 @@ class UserService {
     try {
       const user = UserFactory.createUser(data);
       const createdUser = await this.userRepository.save(user);
-      await walletCreationQueue.add(
-        { user: createdUser },
-        {
-          attempts: Number(process.env.QUEUE_ATTEMPTS) || 3,
-          backoff: {
-            type: "exponential",
-            delay: Number(process.env.QUEUE_DELAY) || 5000,
-          },
-        }
-      );
+      await this.queueService.addWalletCreationJob(createdUser);
       return { success: true, data: createdUser };
     } catch (error: any) {
       logger.error({ error: error.message }, "Error creating user record");
@@ -135,18 +127,7 @@ class UserService {
       );
 
       const savedUsers = await this.saveUsers(userDataArray);
-      const jobs = savedUsers.map((user) => ({
-        data: { user },
-        opts: {
-          attempts: Number(process.env.QUEUE_ATTEMPTS) || 3,
-          backoff: {
-            type: "exponential",
-            delay: Number(process.env.QUEUE_DELAY) || 5000,
-          },
-        },
-      }));
-
-      await walletCreationQueue.addBulk(jobs);
+      await this.queueService.addBulkWalletCreationJobs(savedUsers);
       await this.sendNotificationEmails(mailDataArray);
 
       return {
@@ -338,7 +319,14 @@ class UserService {
   }
 
   async getAllUsers(req: any) {
-    const { page = 1, limit = 10, role, status, region, phoneNumber } = req.query;
+    const {
+      page = 1,
+      limit = 10,
+      role,
+      status,
+      region,
+      phoneNumber,
+    } = req.query;
 
     const filters: Record<string, any> = {};
     if (role) filters.role = role;
@@ -378,30 +366,32 @@ class UserService {
         wallets.map((wallet) => [wallet.userId, wallet])
       );
 
-      const usersWithWalletDetails = users.map(async (user) => {
-        const wallet = walletMap.get(user.id);
-        const supervisor = await this.userRepository.findById(
-          user.supervisorId as string
-        );
-        const means_of_id = await this.idVerificationRepository.findOneWhere({
-          userId: user.id,
-        });
-        return {
-          ...user,
-          supervisor: {
-            firstName: supervisor.firstName,
-            lastName: supervisor.lastName,
-            middlename: supervisor.middleName,
-          },
-          wallet_details: wallet
-            ? {
-                accountNumber: wallet.accountNumber,
-                walletId: wallet.walletId,
-              }
-            : null,
-          means_of_id: means_of_id ?? {},
-        };
-      });
+      const usersWithWalletDetails = await Promise.all(
+        users.map(async (user) => {
+          const wallet = walletMap.get(user.id);
+          const supervisor = await this.userRepository.findById(
+            user.supervisorId as string
+          );
+          const means_of_id = await this.idVerificationRepository.findOneWhere({
+            userId: user.id,
+          });
+          return {
+            ...user,
+            supervisor: {
+              firstName: supervisor.firstName,
+              lastName: supervisor.lastName,
+              middlename: supervisor.middleName,
+            },
+            wallet_details: wallet
+              ? {
+                  accountNumber: wallet.accountNumber,
+                  walletId: wallet.walletId,
+                }
+              : {},
+            means_of_id: means_of_id ?? {},
+          };
+        })
+      );
 
       const totalPages = Math.ceil(totalRecords / pageSize);
 
@@ -540,9 +530,9 @@ class UserService {
       const data = {
         userId: user.id,
         action: "deactivate-user",
-        reason: req.body.reason
-      }
-      if(req.body.reason) await this.createReason(data);
+        reason: req.body.reason,
+      };
+      if (req.body.reason) await this.createReason(data);
       return {
         success: true,
         message: "User account deactivated successfully",
@@ -716,12 +706,11 @@ class UserService {
     const data = {
       userId: user.id,
       action: "delete-user",
-      reason: req.body.reason
-    }
-    if(req.body.reason) await this.createReason(data);
+      reason: req.body.reason,
+    };
+    if (req.body.reason) await this.createReason(data);
     return "User account deleted successfully";
   }
-
 
   async createReason(data: any) {
     const reason = ActionReasonFactory.createReason(data);
@@ -752,5 +741,4 @@ async setTransactionPin(req: Request, res: Response) {
   
 
 }
-
 export default UserService;
