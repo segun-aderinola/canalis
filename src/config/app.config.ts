@@ -47,7 +47,12 @@ const appConfig = {
   		server: process.env.OBS_SERVER_URL,
 		bucket_name: process.env.OBS_BUCKET_NAME
 	},
-	max_concurrent_uploads: Number(process.env.MAX_CONCURRENT_UPLOADS)
+	max_concurrent_uploads: Number(process.env.MAX_CONCURRENT_UPLOADS),
+	jwt_token: {
+	  secret: String(process.env.JWT_SECRET),
+	  session: String(process.env.SESSION),
+	  refresh_token_session: String(process.env.REFRESH_TOKEN_SESSION)
+	}
 	
 };
 
