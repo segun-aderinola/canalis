@@ -3,10 +3,7 @@ import { Response, Request } from "express";
 import { CreateUser } from "../dtos/create-user.dto";
 import UserFactory from "../factories/user.factory";
 import UserRepository from "../repositories/user.repository";
-import {
-  exportCSVData,
-  generateCode,
-} from "@shared/utils/functions.util";
+import { exportCSVData, generateCode } from "@shared/utils/functions.util";
 import MailService from "./mail.service";
 import logger from "@shared/utils/logger";
 import { ErrorResponse, SuccessResponse } from "@shared/utils/response.util";
@@ -19,7 +16,12 @@ import AppError from "@shared/error/app.error";
 import { QueueService } from "../queues/wallet-creation.queue";
 import IdVerificationRepository from "../repositories/id_verification.repository";
 import ActionReasonFactory from "../factories/action_reason.factory";
-
+import { uploadMultipart } from "@shared/external-services/media-upload/media-upload.service";
+import path from "path";
+import appConfig from "@config/app.config";
+import ReasonRepository from "../repositories/reason.repository";
+import AccessControlManagementService from "../../accessControlManagement/services/access-control-management.service";
+import RoleRepo from "../../accessControlManagement/repositories/role.repo";
 @injectable()
 class UserService {
   constructor(
@@ -28,10 +30,13 @@ class UserService {
     private readonly walletService: WalletService,
     private readonly walletRepository: WalletRepository,
     private readonly queueService: QueueService,
-    private readonly idVerificationRepository: IdVerificationRepository
+    private readonly idVerificationRepository: IdVerificationRepository,
+    private readonly reasonRepository: ReasonRepository,
+    private readonly accessControlManagementService: AccessControlManagementService,
+    private readonly roleRepo: RoleRepo
   ) {}
 
-  async createUser(data: CreateUser) {
+  async createUser(data: CreateUser, userId: string) {
     try {
       const existingUserResponse = await this.checkIfUserExists(data.email);
       if (!existingUserResponse?.success) return existingUserResponse;
@@ -43,6 +48,7 @@ class UserService {
 
       const password = this.generateUserPassword();
       data.password = password;
+      data.addedBy = userId;
 
       const userCreationResponse = await this.createUserRecord(data);
       if (!userCreationResponse.success) return userCreationResponse;
@@ -92,9 +98,7 @@ class UserService {
   }
 
   private async validateSupervisor(supervisorId: string) {
-
     return await this.userRepository.findOrWhereQuery({ id: supervisorId });
-
   }
 
   private async createUserRecord(data: CreateUser) {
@@ -113,17 +117,18 @@ class UserService {
     const users = req.body;
     const notAdded: any[] = [];
     const added: any[] = [];
+    let addedBy = req.user.userId;
 
     try {
       const existingUsersMap = await this.getExistingUsers(users);
       const supervisorsMap = await this.getSupervisors(users);
-
       const { userDataArray, mailDataArray } = this.processUsers(
         users,
         existingUsersMap,
         supervisorsMap,
         added,
-        notAdded
+        notAdded,
+        addedBy
       );
 
       const savedUsers = await this.saveUsers(userDataArray);
@@ -159,16 +164,19 @@ class UserService {
   }
 
   private async getSupervisors(users: any[]): Promise<Map<string, any>> {
-    const supervisorIds = Array.from(new Set(users.map((user) => user.supervisorId)));
+    const supervisorIds = Array.from(
+      new Set(users.map((user) => user.supervisorId))
+    );
     return await this.getSupervisorsMap(supervisorIds);
-  }  
+  }
 
   private processUsers(
     users: any[],
     existingUsersMap: Map<string, any>,
     supervisorsMap: Map<string, any>,
     added: any[],
-    notAdded: any[]
+    notAdded: any[],
+    addedBy: string
   ) {
     const userDataArray: IUser[] = [];
     const mailDataArray: {
@@ -184,6 +192,7 @@ class UserService {
       if (!this.hasValidSupervisor(user, supervisorsMap, notAdded)) return;
 
       const password = generateCode(5);
+      user.addedBy = addedBy;
       this.addUserAndMailData(
         user,
         password,
@@ -238,7 +247,6 @@ class UserService {
         this.createUserData(user, password)
       );
       userDataArray.push(newUser);
-
       mailDataArray.push({
         subject: "User Account Creation",
         name: user.name,
@@ -277,8 +285,7 @@ class UserService {
     supervisorIds: string[]
   ): Promise<Map<string, any>> {
     const supervisors = await this.userRepository.findByIdsAndRole(
-      supervisorIds,
-      ["supervisor", "super_admin"]
+      supervisorIds
     );
     return new Map(
       supervisors.map((supervisor) => [supervisor.id, supervisor])
@@ -297,6 +304,7 @@ class UserService {
       role: user.role,
       supervisorId: user.supervisorId,
       region: user.region,
+      addedBy: user.addedBy,
     };
   }
 
@@ -355,46 +363,39 @@ class UserService {
         };
       }
 
-      const userIds = users.map((user) => user.id);
-
-      const wallets =
-        userIds.length > 0
-          ? await this.walletRepository.findAllWhere({ userId: userIds })
-          : [];
-
-      const walletMap = new Map(
-        wallets.map((wallet) => [wallet.userId, wallet])
-      );
-
       const usersWithWalletDetails = await Promise.all(
         users.map(async (user) => {
-          const wallet = walletMap.get(user.id);
+          const addedBy = await this.userRepository.findById(user.addedBy);
+          const reason = await this.reasonRepository.findWhere({
+            userId: user.id,
+          });
           const supervisor = await this.userRepository.findById(
             user.supervisorId as string
           );
-          const means_of_id = await this.idVerificationRepository.findOneWhere({
+          const means_of_id = await this.idVerificationRepository.findOne({
             userId: user.id,
           });
+          const role = await this.roleRepo.findByNameWithRelations(user.role);
           return {
             ...user,
+            addedBy: addedBy ? addedBy?.firstName + " " + addedBy?.lastName : "",
+            reasons: reason,
             supervisor: {
               firstName: supervisor.firstName,
               lastName: supervisor.lastName,
               middlename: supervisor.middleName,
             },
-            wallet_details: wallet
-              ? {
-                  accountNumber: wallet.accountNumber,
-                  walletId: wallet.walletId,
-                }
-              : {},
+            wallet: await this.walletService.getWallet(user.id),
             means_of_id: means_of_id ?? {},
+            permissions: role?.id
+              ? (await this.accessControlManagementService.getRole(role?.id))
+                  .permissions
+              : [],
           };
         })
       );
 
       const totalPages = Math.ceil(totalRecords / pageSize);
-
       return {
         users: usersWithWalletDetails,
         total_result: totalRecords,
@@ -402,7 +403,7 @@ class UserService {
         total_pages: totalPages,
       };
     } catch (error) {
-      console.error("Error fetching users:", error);
+      logger.error({ error: "Error fetching users," });
       throw new Error("An unexpected error occurred while fetching users.");
     }
   }
@@ -506,41 +507,38 @@ class UserService {
     };
   }
 
-
   async userInformation(userId: string): Promise<IUser> {
     return await this.userRepository.findById(userId);
   }
 
   async deactivateUserAccount(req: any) {
-    const id = req.params.id;
-
-    const user = await this.userRepository.findById(id);
-    if (!user) {
-      throw new AppError(400, "User not found");
-    }
-
-    if (user.status === "inactive") {
-      throw new AppError(400, "User account is already deactivated");
-    }
-
     try {
-      const updatedUser = await this.userRepository.updateById(id, {
-        status: "inactive",
-      });
-      const data = {
-        userId: user.id,
-        action: "deactivate-user",
-        reason: req.body.reason,
-      };
-      if (req.body.reason) await this.createReason(data);
+      const id = req.params.id;
+      const user = await this.userRepository.findById(id);
+
+      if (!user) throw new AppError(400, "User not found");
+      if (user.status === "inactive")
+        throw new AppError(400, "User account is already deactivated");
+
+      await this.userRepository.updateById(id, { status: "inactive" });
+
+      req.body.reason &&
+        (await this.createReason({
+          userId: user.id,
+          action: "deactivate-user",
+          reason: req.body.reason,
+        }));
+
       return {
         success: true,
         message: "User account deactivated successfully",
-        data: updatedUser,
       };
-    } catch (error) {
-      logger.error({ error: error }, "Error deactivating user:");
-      throw new AppError(400, "Failed to deactivate user account");
+    } catch (error: any) {
+      logger.error({ error: error.message }, "Error deactivating user:");
+      return {
+        success: false,
+        message: error.message || "Failed to deactivate user account",
+      };
     }
   }
 
@@ -584,7 +582,7 @@ class UserService {
         data: updatedUser,
       };
     } catch (error: any) {
-      logger.error({ error: error.message }, "Error deactivating user");
+      logger.error({ error: error.message }, "Error reactivating user");
       throw new AppError(400, "Failed to activate user account");
     }
   }
@@ -666,22 +664,36 @@ class UserService {
     if (!user) {
       throw new AppError(400, "User does not exist");
     }
-    const supervisor = await this.userRepository.findById(
-      user.supervisorId as string
-    );
-    const means_of_id = await this.idVerificationRepository.findOneWhere({
-      userId: user.id,
-    });
+
+    const [supervisor, means_of_id, addedBy, reason, role] = await Promise.all([
+      user.supervisorId
+        ? this.userRepository.findById(user.supervisorId as string)
+        : null,
+      this.idVerificationRepository.findOne({ userId: user.id }),
+      user.addedBy ? this.userRepository.findById(user.addedBy) : null,
+      this.reasonRepository.findWhere({ userId: user.id }),
+      this.roleRepo.findByNameWithRelations(user.role),
+    ]);
+
+    const wallet = await this.walletService.getWallet(user.id);
+    const permissions = role
+      ? (await this.accessControlManagementService.getRole(role.id)).permissions
+      : [];
 
     return {
       ...user,
-      supervisor: {
-        firstName: supervisor.firstName,
-        lastName: supervisor.lastName,
-        middlename: supervisor.middleName,
-      },
-      wallet: this.walletService.getWallet(user.id),
-      means_of_id: means_of_id ?? {},
+      addedBy: addedBy ? `${addedBy.firstName} ${addedBy.lastName}` : "",
+      reasons: reason || [],
+      supervisor: supervisor
+        ? {
+            firstName: supervisor.firstName,
+            lastName: supervisor.lastName,
+            middleName: supervisor.middleName || "",
+          }
+        : { firstName: "", lastName: "", middleName: "" },
+      wallet: wallet || {},
+      means_of_id: means_of_id || {},
+      permissions,
     };
   }
 
@@ -690,6 +702,15 @@ class UserService {
     const user = await this.userRepository.findById(id);
     if (!user) {
       throw new AppError(400, "User does not exist");
+    }
+    const linkedAgents = await this.userRepository.findOne({
+      supervisorId: user.id,
+    });
+    if (linkedAgents) {
+      throw new AppError(
+        400,
+        "User cannot be deleted because they are assigned as a supervisor to other users."
+      );
     }
 
     const wallet = await this.walletRepository.findOneWhere({
@@ -713,32 +734,60 @@ class UserService {
   }
 
   async createReason(data: any) {
-    const reason = ActionReasonFactory.createReason(data);
-    await this.userRepository.save(reason);
+    try {
+      const reason = ActionReasonFactory.createReason(data);
+      await this.reasonRepository.save(reason);
+    } catch (error: any) {
+      logger.error({ error: error.message }, "Error creating reason");
+    }
   }
 
-async setTransactionPin(req: Request, res: Response) {
-  try {
+  async setTransactionPin(req: Request, res: Response) {
+    try {
       const user = await this.userRepository.findById(req.user.userId);
-      if (!user){
+      if (!user) {
         return res
           .status(httpStatus.CONFLICT)
           .send(ErrorResponse("User does not exists"));
       }
       await this.userRepository.updateById(user.id, {
-
-        transactionPin: req.body.transactionPin
+        transactionPin: req.body.transactionPin,
       });
       return res
-          .status(httpStatus.OK)
-          .send(SuccessResponse("Transaction Pin set successfully"));
-  } catch (error: any) {
+        .status(httpStatus.OK)
+        .send(SuccessResponse("Transaction Pin set successfully"));
+    } catch (error: any) {
       logger.error({ error: error.message }, "Error setting transaction pin");
-    
+
       throw new ServiceUnavailableError();
     }
   }
-  
 
+  async uploadFile(req: Request) {
+    try {
+      if (!req.file) {
+        throw new AppError(400, "No file uploaded");
+      }
+
+      const bucketName = appConfig.obs_credential.bucket_name as string;
+      const mimeType = req.file.mimetype;
+      const fileBuffer = req.file.buffer;
+      const objectKey = `uploads/${Date.now()}_${path.basename(
+        req.file.originalname
+      )}`;
+
+      const uploadedUrl = await uploadMultipart(
+        bucketName,
+        objectKey,
+        fileBuffer,
+        mimeType
+      );
+
+      return uploadedUrl;
+    } catch (error: any) {
+      logger.error({ error: "Uoload error" }, error.message);
+      throw new ServiceUnavailableError("Upload Error");
+    }
+  }
 }
 export default UserService;

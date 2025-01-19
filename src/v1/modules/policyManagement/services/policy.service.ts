@@ -23,7 +23,7 @@ class PolicyService {
     private readonly userService: UserService
   ) {}
 
-  async createPolicy(data: CreatePolicy) {
+  async createPolicy(data: CreatePolicy): Promise<any> {
     try {
       await this.userService.checkSupervisorExistence(data.supervisorId);
       const policy = PolicyFactory.createPolicy(data);

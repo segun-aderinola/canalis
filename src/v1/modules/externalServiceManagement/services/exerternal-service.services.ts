@@ -9,7 +9,6 @@ import { GetQuoteDTO, GetQuotesDTO, OnboardCustomerDTO, PaymentLinkDTO, PremiumD
 import ExternalServiceFactory from "../factories/external-service.factory";
 import { IPaymentLinkRes } from "@shared/external-services/payments/payments.types";
 import { IOnboardCustomerRes } from "@shared/external-services/customers/customers.types";
-
 @injectable()
 class ExternalService {
 	constructor(

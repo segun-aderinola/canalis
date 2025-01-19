@@ -16,7 +16,9 @@ export type CreateUser = {
   supervisorId?: string;
   transactionPin?: string;
   region: string;
+  refreshToken?: string;
   signature?: string
+  addedBy: string
   createdAt?: Date;
   updatedAt?: Date;
 };

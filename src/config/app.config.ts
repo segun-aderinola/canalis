@@ -41,6 +41,14 @@ const appConfig = {
 		base_url: String(process.env.API_GATEWAY_URL),
 		secret_key: String(process.env.API_GATEWAY_SECRET_KEY),
 	},
+	obs_credential: {
+		access_key_id: process.env.OBS_ACCESS_KEY_ID,
+  		secret_access_key: process.env.OBS_SECRET_ACCESS_KEY,
+  		server: process.env.OBS_SERVER_URL,
+		bucket_name: process.env.OBS_BUCKET_NAME
+	},
+	max_concurrent_uploads: Number(process.env.MAX_CONCURRENT_UPLOADS)
+	
 };
 
 export default appConfig;

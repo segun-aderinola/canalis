@@ -15,7 +15,6 @@ import {
 } from "../validations/external-service.validator";
 import accessControlMiddleware from "@shared/middlewares/access-control.middleware";
 import { AccessControls } from "../../accessControlManagement/enums/access-control.enum";
-
 const externalServiceController = container.resolve(ExternalServiceController);
 const router = express.Router();
 

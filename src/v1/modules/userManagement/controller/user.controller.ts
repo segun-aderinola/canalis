@@ -11,9 +11,10 @@ class UserManagementController {
 
 
   createUser = async (req: Request, res: Response) => {
-    const result: any = await this.userService.createUser(req.body);
+    const result: any = await this.userService.createUser(req.body, req.user.userId);
     return res.status(result.success ? httpStatus.OK : httpStatus.BAD_REQUEST).json(result);
   };
+
   uploadBulkUser = async (req: Request, res: Response) => {
     const result: any = await this.userService.uploadBulkUsers(req);
     if (result.success) {
@@ -27,7 +28,6 @@ class UserManagementController {
     const result: any = await this.userService.getProfile(req);
     return res.status(result.success ? httpStatus.OK : httpStatus.BAD_REQUEST).json(result);
   };
-
 
   getAll = async (req: Request, res) => {
     try {
@@ -53,16 +53,13 @@ class UserManagementController {
 
   deactiveUserAccount = async (req: Request, res: Response) => {
     try {
-      const result = await this.userService.deactivateUserAccount(req);
-      if (result.success) {
-        return res.send(SuccessResponse(result.message));
-      } else {
-        return res.status(400).json({ status: result.success, message: result.message });
-      }
-    } catch (error) {
-      return res.status(500).json({ status: false, message: "Failed to deactivate user account" });
+        const result = await this.userService.deactivateUserAccount(req);
+        return res.status(result.success ? 200 : 400).json({ status: result.success, message: result.message });
+    } catch (error: any) {
+        logger.error({ error: error.message }, "Error in deactiveUserAccount:");
+        return res.status(500).json({ status: false, message: error.message || "Failed to deactivate user account" });
     }
-  };
+};
   
   reactiveUserAccount = async (req: Request, res: Response) => {
     try {
@@ -74,7 +71,7 @@ class UserManagementController {
       }
     } catch (error: any) {
       logger.error({error: error.message}, "Error deactivating user");
-      return res.status(500).json({ status: false, message: "Failed to deactivate user account" });
+      return res.status(500).json({ status: false, message: "Failed to reactivate user account" });
     }
   };
 
@@ -146,6 +143,12 @@ getUser = async (req: Request, res: Response) => {
       .status(httpStatus.OK)
       .send(SuccessResponse(response));
   };
+
+  uploadFile = async (req: Request, res: Response): Promise<void> => {
+    const response = await this.userService.uploadFile(req);
+  
+	  res.send(SuccessResponse("Operation successful", { url: response }));
+	};
 }
 
 export default UserManagementController;

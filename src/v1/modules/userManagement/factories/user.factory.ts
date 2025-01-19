@@ -15,6 +15,7 @@ class UserFactory {
     user.password = data.password;
     user.address = data.address;
     user.region = data.region;
+    user.addedBy = data.addedBy;
 
 
      

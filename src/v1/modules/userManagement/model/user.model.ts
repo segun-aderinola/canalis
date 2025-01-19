@@ -23,6 +23,8 @@ export class User extends Model {
   isDefaultPassword!: boolean;
   signature!: string;
   transactionPin!: string;
+  refreshToken!: string;
+  addedBy!: string;
   
   static relationMappings = {
     userRole: {
