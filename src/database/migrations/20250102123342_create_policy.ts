@@ -6,7 +6,7 @@ export async function up(knex: Knex): Promise<void> {
     table.uuid("id").primary().defaultTo(knex.fn.uuid());
     table.string("agentId").notNullable();
     table.string("supervisorId").notNullable();
-    table.string("policyId").notNullable();
+    table.string("policyId").nullable();
     table.string("customerId").notNullable();
     table.string("productId").notNullable();
     table.string("customerType").notNullable();
@@ -24,7 +24,7 @@ export async function up(knex: Knex): Promise<void> {
     table.string("ourSharePercentage").notNullable();
     table.string("classOfBusinessId").notNullable();
     table.string("currency").notNullable();
-    table.string("status").notNullable().defaultTo('pending').comment("pending, rejected, approved");
+    table.string("status").notNullable().defaultTo('pending').comment("pending, rejected, approved, processing, activated");
     table.string("cbaStatus").nullable();
     table.string("savingsGoal").nullable();
     table.string("payementFrquency").nullable();

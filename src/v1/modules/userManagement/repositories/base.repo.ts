@@ -65,12 +65,9 @@ export class BaseRepository<T, M extends Model> {
     return this.model.query().whereIn('email', emails);
   }
 
-  async findByIdsAndRole(ids: string[], roles: string[]): Promise<any[]> {
+  async findByIdsAndRole(ids: string[]): Promise<any[]> {
     return this.model.query()
-      .whereIn('id', ids)
-      .andWhere((builder) => {
-        builder.whereIn('role', roles);
-      });
+      .whereIn('id', ids);
   }
 
   async saveMany(users: any[]): Promise<any[]> {

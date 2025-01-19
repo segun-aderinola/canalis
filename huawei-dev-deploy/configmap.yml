@@ -30,6 +30,11 @@ data:
   FROM_NAME: "Emple"
   QUEUE_ATTEMPTS: "3"
   QUEUE_DELAY: "5000"
+  OBS_ACCESS_KEY_ID: "IF4HI2F7PS9JP9G4NHDY"
+  OBS_SECRET_ACCESS_KEY: "plm4vJOdT15EssRSKWQJa90ztwIhk54a6DpvzQjX"
+  OBS_SERVER_URL: "obs.ap-southeast-1.myhuaweicloud.com"
+  OBS_BUCKET_NAME: "agency-documents"
+  MAX_CONCURRENT_UPLOADS: "5"
  
  
 

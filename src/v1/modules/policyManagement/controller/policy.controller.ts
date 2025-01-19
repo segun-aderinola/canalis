@@ -13,10 +13,10 @@ class PolicyController {
   createPolicy = async (req: any, res: Response) => {
     try {
       req.body.agentId = req.user.userId;
-      await this.policyService.createPolicy(req.body);
+      const policy = await this.policyService.createPolicy(req.body);
       return res
         .status(httpStatus.CREATED)
-        .send(SuccessResponse("Operation successful"));
+        .send(SuccessResponse("Operation successful", policy));
     } catch (error: any) {
       return res
         .status(500)

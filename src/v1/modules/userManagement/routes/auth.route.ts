@@ -6,6 +6,7 @@ import { passwordResetRules } from "../validations/password-reset.validator";
 import { resetPasswordRules } from "../validations/reset-password.validator";
 import { changePasswordRules } from "../validations/change-password.validator";
 import { loginRules } from "../validations/login.validator";
+import { refreshTokenRules } from "../validations/refresh-token.validator";
 
 const authController = container.resolve(AuthController);
 const router = express.Router();
@@ -30,6 +31,10 @@ router.post("/auth/create-password", validate(changePasswordRules), (req: Reques
 
 router.post("/auth/login", validate(loginRules), (req: Request, res: Response) => {
   authController.login(req, res);
+});
+
+router.post("/auth/refreshToken", validate(refreshTokenRules), (req: Request, res: Response) => {
+  authController.refreshToken(req, res);
 });
 
 

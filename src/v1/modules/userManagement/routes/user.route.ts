@@ -17,12 +17,16 @@ import authMiddleware from "@shared/middlewares/auth.middleware";
 
 const userController = container.resolve(UserManagementController);
 import { getSingleUserRules } from "../validations/get-single-user.validator";
+import multer from "multer";
+const upload = multer({ storage: multer.memoryStorage() });
+
 import { deactivateReasonRules } from "../validations/deactivation-reason.validator";
 import { deleteReasonRules } from "../validations/delete-reason.validator";
+
 const router = express.Router();
 
 
-router.post("/admin/create-user", [validate(createUserRules)], (req: Request, res: Response, next) => userController.createUser(req, res).catch((err)=> next(err) )
+router.post("/admin/create-user", [authMiddleware, accessControlMiddleware(AccessControls.USER_ONBOARDING), validate(createUserRules)], (req: Request, res: Response, next) => userController.createUser(req, res).catch((err)=> next(err) )
 );
 
 router.post("/admin/upload-bulk-user", [authMiddleware, accessControlMiddleware(AccessControls.BULK_USER_ONBOARDING), validateArray(uploadBulkUserRules)], (req: Request, res: Response) => 
@@ -83,6 +87,14 @@ router.delete(
   (req: Request, res: Response, next) => {
     userController.deleteUser(req, res).catch((e) => next(e));
   }
+);
+
+router.post(
+	"/upload-media",
+	upload.single("file"),
+	(req: Request, res: Response, next) => {
+		userController.uploadFile(req, res).catch((e) => next(e));
+	}
 );
 
 export default router;
