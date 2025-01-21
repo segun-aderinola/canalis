@@ -26,7 +26,7 @@ class WalletController {
   };
   withdraw = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const response = await this.walletService.transfer(req.user.userId, req.body);
+      const response = await this.walletService.transfer(req.user.id, req.body);
       res.send(SuccessResponse("Operation successful", response));
     } catch (error) {
       next(error);
@@ -35,7 +35,7 @@ class WalletController {
 
   transactionHistory = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const response = await this.walletService.transactionHistory(req.user.userId);
+      const response = await this.walletService.transactionHistory(req.user.id);
       res.send(SuccessResponse("Operation successful", response));
     } catch (error) {
       next(error);

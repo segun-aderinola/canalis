@@ -20,7 +20,7 @@ class NotificationService {
   }
 
   public async getAll(req: any) {
-    return await this.notificationRepository.findWhere({ userId: req.user.userId });
+    return await this.notificationRepository.findWhere({ userId: req.user.id });
   }
 
   private handleNotificationError = (notification: INotification, error: any) => {

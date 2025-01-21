@@ -12,7 +12,7 @@ class PolicyController {
 
   createPolicy = async (req: any, res: Response) => {
     try {
-      req.body.agentId = req.user.userId;
+      req.body.agentId = req.user.id;
       const policy = await this.policyService.createPolicy(req.body);
       return res
         .status(httpStatus.CREATED)

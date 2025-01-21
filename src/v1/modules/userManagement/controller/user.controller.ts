@@ -11,7 +11,7 @@ class UserManagementController {
 
 
   createUser = async (req: Request, res: Response) => {
-    const result: any = await this.userService.createUser(req.body, req.user.userId);
+    const result: any = await this.userService.createUser(req.body, req.user.id);
     return res.status(result.success ? httpStatus.OK : httpStatus.BAD_REQUEST).json(result);
   };
 

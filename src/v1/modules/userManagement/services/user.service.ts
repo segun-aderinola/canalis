@@ -117,7 +117,7 @@ class UserService {
     const users = req.body;
     const notAdded: any[] = [];
     const added: any[] = [];
-    let addedBy = req.user.userId;
+    let addedBy = req.user.id;
 
     try {
       const existingUsersMap = await this.getExistingUsers(users);
@@ -619,7 +619,7 @@ class UserService {
 
   async uploadSignature(req: Request, res: Response) {
     try {
-      const user = await this.userRepository.findById(req.user.userId);
+      const user = await this.userRepository.findById(req.user.id);
 
       if (!user) {
         return res
@@ -640,7 +640,7 @@ class UserService {
 
   async uploadProfilePicture(req: Request, res: Response) {
     try {
-      const user = await this.userRepository.findById(req.user.userId);
+      const user = await this.userRepository.findById(req.user.id);
 
       if (!user) {
         return res
@@ -655,7 +655,7 @@ class UserService {
         .send(SuccessResponse("Profile Picture uploaded successfully"));
     } catch (error: any) {
       logger.error({ error: error.message }, "Error uploading profile picture");
-      throw new ServiceUnavailableError();
+      throw new ServiceUnavailableError(error.message);
     }
   }
 
@@ -744,7 +744,7 @@ class UserService {
 
   async setTransactionPin(req: Request, res: Response) {
     try {
-      const user = await this.userRepository.findById(req.user.userId);
+      const user = await this.userRepository.findById(req.user.id);
       if (!user) {
         return res
           .status(httpStatus.CONFLICT)
