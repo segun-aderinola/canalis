@@ -655,7 +655,7 @@ class UserService {
         .send(SuccessResponse("Profile Picture uploaded successfully"));
     } catch (error: any) {
       logger.error({ error: error.message }, "Error uploading profile picture");
-      throw new ServiceUnavailableError();
+      throw new ServiceUnavailableError(error.message);
     }
   }
 
