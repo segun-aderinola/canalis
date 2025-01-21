@@ -35,6 +35,7 @@ data:
   OBS_SERVER_URL: "obs.ap-southeast-1.myhuaweicloud.com"
   OBS_BUCKET_NAME: "agency-documents"
   MAX_CONCURRENT_UPLOADS: "5"
+  REFRESH_TOKEN_SESSION: "360000000"
  
  
 

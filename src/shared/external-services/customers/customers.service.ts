@@ -11,6 +11,7 @@ import AppError from "@shared/error/app.error";
 export class CustomerService implements ICustomerServiceActions {
 	private static instance: CustomerService;
 	private httpClient: AxiosInstance;
+	private url: string;
 
 	private constructor() {
 		this.httpClient = HTTPClient.create({
@@ -19,18 +20,24 @@ export class CustomerService implements ICustomerServiceActions {
 				"x-secret-key": appConfig.api_gateway.secret_key,
 			},
 		});
+		this.url = "/general/customer/onboard";
 	}
 
 	async onboardCustomer(
 		payload: IOnboardCustomerPayload
 	): Promise<IOnboardCustomerRes> {
-		const url = `/individual`;
+		const { accessToken, ...requestBody } = payload;
+		const path = `${this.url}/individual`;
 		const response = await this.httpClient
-			.post<ICustomerResponse<IOnboardCustomerRes>>(url, payload)
+			.post<ICustomerResponse<IOnboardCustomerRes>>(path, requestBody, {
+				headers: {
+					Authorization: `Bearer ${accessToken}`,
+				},
+			})
 			.catch((e) => {
-				return this.errorHandler(e, payload, "onboardCustomer");
+				return this.errorHandler(e, requestBody, "onboardCustomer");
 			});
-		this.requestResponseLogger(payload, response, url);
+		this.requestResponseLogger(requestBody, response, path);
 		return response.data.data;
 	}
 
@@ -42,7 +49,7 @@ export class CustomerService implements ICustomerServiceActions {
 				{ e, payload },
 				`CustomerServicerviceErrorHandler[${action}]: ${errorMessage}`
 			);
-			throw new AppError(e.response.status, e.response.data.message);
+			throw new AppError(e.response.status, e.response.data.message, e.response.data.errors);
 		} else {
 			logger.error(
 				{ e, payload },

@@ -20,7 +20,8 @@ export interface IOnboardCustomerPayload {
 	idType: string;
 	idExpiryDate: string;
 	idNumber: string;
-	documents: string[];
+	documents?: string[];
+	accessToken?: string;
 }
 
 interface IKyc {

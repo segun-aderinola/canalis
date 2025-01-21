@@ -71,12 +71,13 @@ export const generateJwtToken = async (user: any) => {
   const session = process.env.SESSION;
   const token = jwt.sign(
 		{
-			userId: user.id,
-			role: user.role,
-			email: user.email,
-      firstName: user.firstName,
-	    lastName: user.lastName,
-			phoneNumber: user.phoneNumber,
+			user: {
+				id: user.id,
+				accessGroup: user.role,
+				email: user.email,
+				name: `${user.firstName} ${user.lastName}`,
+				phoneNumber: user.phoneNumber,
+			},
 		},
 		secret_key,
 		{ expiresIn: session }
@@ -89,12 +90,13 @@ export const generateRefreshToken = async (user: any) => {
   const session = process.env.REFRESH_TOKEN_SESSION;
   const token = jwt.sign(
 		{
-			userId: user.id,
-			role: user.role,
-			email: user.email,
-      firstName: user.firstName,
-	    lastName: user.lastName,
-			phoneNumber: user.phoneNumber,
+			user: {
+				id: user.id,
+				accessGroup: user.role,
+				email: user.email,
+				name: `${user.firstName} ${user.lastName}`,
+				phoneNumber: user.phoneNumber,
+			},
 		},
 		secret_key,
 		{ expiresIn: session }
