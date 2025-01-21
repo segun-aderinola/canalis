@@ -100,6 +100,17 @@ class PolicyController {
         .json(ErrorResponse(error.message));
     }
   };
+
+  addBeneficiaryDetails = async (req: Request, res: Response) => {
+    try {
+      await this.policyService.creationCallback(req);
+      res.send(SuccessResponse("Operation successful"));
+    } catch (error: any) {
+      res
+        .status(500)
+        .json(ErrorResponse(error.message));
+    }
+  };
 }
 
 export default PolicyController;

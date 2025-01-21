@@ -13,4 +13,5 @@ export enum DB_TABLES {
 	NOTIFICATIONS = "notifications",
 	TRANSACTIONS = "transactions",
 	ACTION_REASONS = "action_reasons",
+	POLICY_BENEFICIARY = "policy_beneficiaries",
 }

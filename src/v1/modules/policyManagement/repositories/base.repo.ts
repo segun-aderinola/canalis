@@ -33,6 +33,10 @@ export class BaseRepository<T, M extends Model> {
     return await this.model.query(transaction).insert(data).returning("*");
   }
 
+  async createBulk(data: Partial<T>[], transaction?: Transaction): Promise<M[]> {
+    return await this.model.query(transaction).insert(data).returning("*");
+  }
+
   async getAll() {
     return await this.model.query();
   }
@@ -56,7 +60,7 @@ export class BaseRepository<T, M extends Model> {
   }
 
   async findOneWhere(filter: ObjectLiteral): Promise<T | undefined> {
-    return await this.model.query().where(filter)[0];
+    return await this.model.query().where(filter).first();
   }
 
   async findWhere(filter: ObjectLiteral, relations: string[] = []): Promise<T[]> {
