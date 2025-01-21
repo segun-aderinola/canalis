@@ -30,6 +30,9 @@ export interface IGenerateQuotePayload {
 	brokerName: string;
 	brokerPhoneNumber: string;
 	covers: ICovers[];
+	premiumCalculationType: string;
+	isMotorProduct: string;
+	totalNoOfVehicles: number;
 	accessToken?: string;
 }
 
@@ -68,7 +71,7 @@ export interface IGenerateQuoteResponse {
 }
 
 export interface IGetQuotesPayload {
-	quotationNumber: string;
+	search: string;
 	page: number;
 	perPage: number;
 	accessToken?: string;

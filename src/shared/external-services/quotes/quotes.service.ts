@@ -11,6 +11,7 @@ import AppError from "@shared/error/app.error";
 export class QuoteService implements IQuoteServiceActions {
 	private static instance: QuoteService;
 	private httpClient: AxiosInstance;
+	private url: string;
 
 	private constructor() {
 		this.httpClient = HTTPClient.create({
@@ -19,69 +20,74 @@ export class QuoteService implements IQuoteServiceActions {
 				"x-secret-key": appConfig.api_gateway.secret_key,
 			},
 		});
+		this.url = "/general/quotations";
 	}
 
 	async generateQuote(
 		payload: IGenerateQuotePayload
 	): Promise<IGenerateQuoteResponse> {
-		const path = `/quotations`;
+		const { accessToken, ...requestBody } = payload;
+		const path = `${this.url}`;
 		const response = await this.httpClient
-			.post<IQuoteResponse<IGenerateQuoteResponse>>(path, payload, {
+			.post<IQuoteResponse<IGenerateQuoteResponse>>(path, requestBody, {
 				headers: {
-					Authorization: `Bearer ${payload.accessToken}`,
+					Authorization: `Bearer ${accessToken}`,
 				},
 			})
 			.catch((e) => {
-				return this.errorHandler(e, payload, "generateQuote");
+				return this.errorHandler(e, requestBody, "generateQuote");
 			});
-		this.requestResponseLogger(payload, response, path);
+		this.requestResponseLogger(requestBody, response, path);
 		return response.data.data;
 	}
 
 	async getQuotes(payload: IGetQuotesPayload): Promise<IGetQuotesRes[]> {
-		const path = `/quotations/?quotationNumber${payload.quotationNumber}&page=${payload.page}&perPage=${payload.perPage}`;
+		const { accessToken, ...requestBody } = payload;
+		const path = `${this.url}/?search${requestBody.search}&page=${requestBody.page}&perPage=${requestBody.perPage}`;
 		const response = await this.httpClient
 			.get<IQuoteResponse<IGetQuotesRes[]>>(path, {
 				headers: {
-					Authorization: `Bearer ${payload.accessToken}`,
+					Authorization: `Bearer ${accessToken}`,
 				},
 			})
 			.catch((e) => {
-				return this.errorHandler(e, payload, "getQuotes");
+				return this.errorHandler(e, requestBody, "getQuotes");
 			});
-		this.requestResponseLogger(payload, response, path);
+		this.requestResponseLogger(requestBody, response, path);
 		return response.data.data;
 	}
 
 	async getQuoteById(payload: IGetQuoteByIdPayload): Promise<IGetQuoteByIdRes> {
-		const path = `/${payload.id}`;
+		const { accessToken, ...requestBody } = payload;
+		const path = `${this.url}/${requestBody.id}`;
 		const response = await this.httpClient
 			.get<IQuoteResponse<IGetQuoteByIdRes>>(path, {
 				headers: {
-					Authorization: `Bearer ${payload.accessToken}`,
+					Authorization: `Bearer ${accessToken}`,
 				},
 			})
 			.catch((e) => {
-				return this.errorHandler(e, payload, "getQuoteById");
+				return this.errorHandler(e, requestBody, "getQuoteById");
 			});
-		this.requestResponseLogger(payload, response, path);
+		this.requestResponseLogger(requestBody, response, path);
 		return response.data.data;
 	}
 
 	async getQuoteHistoryByID(
 		payload: IGetQuoteByIdPayload
 	): Promise<IGetQuoteByIdRes[]> {
-		const path = `/${payload.id}/history`;
+		const { accessToken, ...requestBody } = payload;
+		const path = `${this.url}/${payload.id}/history`;
 		const response = await this.httpClient
 			.get<IQuoteResponse<IGetQuoteByIdRes[]>>(path, {
 				headers: {
-					Authorization: `Bearer ${payload.accessToken}`,
+					Authorization: `Bearer ${accessToken}`,
 				},
 			})
 			.catch((e) => {
-				return this.errorHandler(e, payload, "getQuoteHistoryByID");
+				return this.errorHandler(e, requestBody, "getQuoteHistoryByID");
 			});
-		this.requestResponseLogger(payload, response, path);
+		this.requestResponseLogger(requestBody, response, path);
 		return response.data.data;
 	}
 

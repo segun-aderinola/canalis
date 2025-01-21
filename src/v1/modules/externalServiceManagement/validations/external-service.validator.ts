@@ -11,7 +11,7 @@ export const generateQuoteRules = {
 	sumInsured: "required|numeric",
 	productId: "required|uuid",
 	premiumRate: "required|numeric",
-	discountRate: "required|numeric",
+	discountRate: "numeric",
 	customerName: "required|string",
 	customerEmail: "required|email",
 	customerPhone: "required|string",
@@ -19,7 +19,10 @@ export const generateQuoteRules = {
 	brokerId: "uuid",
 	brokerName: "string",
 	brokerPhoneNumber: "string",
-	covers: "array"
+	covers: "array",
+	totalNoOfVehicles: "numeric",
+	isMotorProduct: "boolean",
+	premiumCalculationType: "string"
 };
 
 export const generatePaymentLinkRules = {
@@ -43,13 +46,13 @@ export const onboardCustomerRules = {
 	idType: "required|string",
 	idExpiryDate: "required|date",
 	idNumber: "required|string",
-	documents: "required|array",
+	documents: "array",
 };
 
 export const getSingleQuoteRules = getSingleProductRules;
 
 export const getQuotesRules = {
-	quotationNumber: "required|string",
+	search: "string",
 	page: "numeric",
 	perPage: "numeric",
 };
