@@ -14,7 +14,6 @@ const authMiddleware = (req: Request, res: Response, done) => {
     (req as any).user = payload.user;
 
     (req as any).accessToken = authToken;
-    console.log(payload.user)
     done();
   } catch (err) {
     return res.status(httpStatus.UNAUTHORIZED).send(ErrorResponse("You are unauthorized"));
