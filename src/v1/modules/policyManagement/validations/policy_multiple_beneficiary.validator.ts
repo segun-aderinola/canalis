@@ -1,5 +1,4 @@
-export const policyBeneficiariesValidationRules = {
-  "policyBeneficiaries.*.policyId": "required|string|uuid",
+export const policyBulkBeneficiariesValidationRules = {
   "policyBeneficiaries.*.firstName": "required|string|min:2|max:50",
   "policyBeneficiaries.*.lastName": "required|string|min:2|max:50",
   "policyBeneficiaries.*.gender": "required|string|in:Male,Female,Other",

@@ -9,6 +9,8 @@ import accessControlMiddleware from "@shared/middlewares/access-control.middlewa
 import { AccessControls } from "../../accessControlManagement/enums/access-control.enum";
 import authMiddleware from "@shared/middlewares/auth.middleware";
 import PolicyBeneficiaryController from "../controller/policy_beneficiary.controller";
+import { policyBeneficiaryValidationRules } from "../validations/policy_beneficiary.validator";
+import { policyBulkBeneficiariesValidationRules } from "../validations/policy_multiple_beneficiary.validator";
 
 const policyController = container.resolve(PolicyController);
 const notificationController = container.resolve(NotificationController);
@@ -56,11 +58,11 @@ router.post("/policy/callback", validate(policyCallbackValidationRules), (req: R
   policyController.creationCallback(req, res);
 });
 
-router.post("/policy/multiple-beneficiary/:id", authMiddleware, accessControlMiddleware(AccessControls.POLICY_CREATION), (req: Request, res: Response) => {
+router.post("/policy/multiple-beneficiary/:id", authMiddleware, accessControlMiddleware(AccessControls.POLICY_CREATION), validate(policyBulkBeneficiariesValidationRules), (req: Request, res: Response) => {
   policyBeneficiaryController.createMultiplePolicyBeneficiary(req, res);
 });
 
-router.post("/policy/beneficiary/:id", authMiddleware, accessControlMiddleware(AccessControls.POLICY_CREATION), (req: Request, res: Response) => {
+router.post("/policy/beneficiary/:id", authMiddleware, accessControlMiddleware(AccessControls.POLICY_CREATION), validate(policyBeneficiaryValidationRules), (req: Request, res: Response) => {
   policyBeneficiaryController.createPolicyBeneficiary(req, res);
 });
 
