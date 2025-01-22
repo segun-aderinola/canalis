@@ -27,6 +27,7 @@ class PolicyBeneficiaryService {
       if(!policy) throw new AppError(400, "Policy not found")
         if (req.body.percentageRate > 100) throw new AppError(400, `Total percentage of rate sharing exceeds 100%.`);
         req.body.userId = req.user.id
+        req.body.policyId = req.params.id
         const policyBeneficiary: IPolicyBeneficiary = PolicyBeneficiaryFactory.createPolicyBeneficiary(req.body);
         return await this.policyBeneficiaryRepository
           .save(policyBeneficiary)
