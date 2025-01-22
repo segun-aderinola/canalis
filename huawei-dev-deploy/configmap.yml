@@ -38,8 +38,6 @@ data:
   REFRESH_TOKEN_SESSION: "360000000"
  
  
-
----
 apiVersion: v1
 kind: Secret
 metadata:

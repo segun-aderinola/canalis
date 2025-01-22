@@ -3,6 +3,7 @@ import { v4 as uuid } from "uuid";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import { createObjectCsvStringifier } from 'csv-writer';
+import appConfig from "@config/app.config";
 
 dotenv.config();
 export const GetRandomID = (maxLength: number = 30): string => {
@@ -67,8 +68,8 @@ export const generateToken = async () => {
 };
 
 export const generateJwtToken = async (user: any) => {
-  const secret_key: any = process.env.JWT_SECRET;
-  const session = process.env.SESSION;
+  const secret_key: any = appConfig.jwt_token.secret;
+  const session = appConfig.jwt_token.session;
   const token = jwt.sign(
 		{
 			user: {
@@ -86,8 +87,8 @@ export const generateJwtToken = async (user: any) => {
 };
 
 export const generateRefreshToken = async (user: any) => {
-  const secret_key: any = process.env.JWT_SECRET;
-  const session = process.env.REFRESH_TOKEN_SESSION;
+  const secret_key: any = appConfig.jwt_token.secret;
+  const session = appConfig.jwt_token.refresh_token_session;
   const token = jwt.sign(
 		{
 			user: {
