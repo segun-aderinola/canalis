@@ -12,6 +12,7 @@ import jwt from "jsonwebtoken";
 import ServiceUnavailableError from "@shared/error/service-unavailable.error";
 import AccessControlManagementService from "../../accessControlManagement/services/access-control-management.service";
 import RoleRepo from "../../accessControlManagement/repositories/role.repo";
+import appConfig from "@config/app.config";
 @injectable()
 class AuthService {
   constructor(
@@ -171,7 +172,7 @@ class AuthService {
 
   async refreshToken(oldRefreshToken: { refreshToken: string }) {
     try {
-      const decoded = jwt.verify(oldRefreshToken.refreshToken, process.env.JWT_SECRET);
+      const decoded = jwt.verify(oldRefreshToken.refreshToken, appConfig.jwt_token.secret);
       const user = await this.userRepository.findById(decoded.userId);
 
       if (!user || user.refreshToken !== oldRefreshToken.refreshToken) {
