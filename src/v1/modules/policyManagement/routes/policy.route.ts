@@ -62,7 +62,11 @@ router.post("/policy/multiple-beneficiary/:id", authMiddleware, accessControlMid
   policyBeneficiaryController.createMultiplePolicyBeneficiary(req, res);
 });
 
-router.post("/policy/beneficiary/:id", authMiddleware, accessControlMiddleware(AccessControls.POLICY_CREATION), validate(policyBeneficiaryValidationRules), (req: Request, res: Response) => {
+router.post("/policy/beneficiary/:id", 
+  [authMiddleware,
+  accessControlMiddleware(AccessControls.POLICY_CREATION),
+  validate(policyBeneficiaryValidationRules)],
+  (req: Request, res: Response) => {
   policyBeneficiaryController.createPolicyBeneficiary(req, res);
 });
 
