@@ -130,7 +130,7 @@ getUser = async (req: Request, res: Response) => {
     );
 
     return res
-      .status(httpStatus.CREATED)
+      .status(httpStatus.OK)
       .send(SuccessResponse("Operation successful", response));
   };
 
