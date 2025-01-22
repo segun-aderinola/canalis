@@ -37,7 +37,7 @@ class PolicyBeneficiaryService {
     }
   }
 
-  async createMultiplePolicyBeneficiary(req: Request) {
+  async addPolicyBeneficiary(req: Request) {
     try {
       const policyId = req.params.id;
       const beneficiaries: IPolicyBeneficiary[] = req.body;

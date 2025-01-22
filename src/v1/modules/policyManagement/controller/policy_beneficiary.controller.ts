@@ -10,22 +10,9 @@ class PolicyBeneficiaryController {
     private readonly policyBeneficiaryService: PolicyBeneficiaryService
   ) {}
 
-  createPolicyBeneficiary = async (req: Request, res: Response) => {
+  addPolicyBeneficiary = async (req: Request, res: Response) => {
     try {
-      const policyBeneficiary = await this.policyBeneficiaryService.createPolicyBeneficiary(req);
-      return res
-        .status(httpStatus.CREATED)
-        .send(SuccessResponse("Operation successful", policyBeneficiary));
-    } catch (error: any) {
-      return res
-        .status(500)
-        .json(ErrorResponse(error.message));
-    }
-  };
-
-  createMultiplePolicyBeneficiary = async (req: Request, res: Response) => {
-    try {
-      const policyBeneficiary = await this.policyBeneficiaryService.createMultiplePolicyBeneficiary(req);
+      const policyBeneficiary = await this.policyBeneficiaryService.addPolicyBeneficiary(req);
       return res
         .status(httpStatus.CREATED)
         .send(SuccessResponse("Operation successful", policyBeneficiary));
