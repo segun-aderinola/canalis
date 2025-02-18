@@ -1,4 +1,3 @@
-// import { ObjectLiteral } from "@shared/types/object-literal.type";
 import { CreateWallet } from "../dtos/create-wallet.dto";
 import { IWallet } from "../model/wallet.model";
 

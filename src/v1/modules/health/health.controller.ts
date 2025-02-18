@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { Response } from "express";
 import { injectable } from "tsyringe";
 import HealthService from "./health.service";
 
@@ -6,12 +6,12 @@ import HealthService from "./health.service";
 class HealthController {
   constructor(private healthService: HealthService) {}
 
-  readinessCheck = async (req: Request, res: Response) => {
-    await this.healthService.readinessCheck(req, res);
+  readinessCheck = async (res: Response) => {
+    await this.healthService.readinessCheck(res);
   };
 
-  livelinessCheck = async (req: Request, res: Response) => {
-    await this.healthService.livelinessCheck(req, res);
+  livelinessCheck = async (res: Response) => {
+    await this.healthService.livelinessCheck(res);
   };
 }
 

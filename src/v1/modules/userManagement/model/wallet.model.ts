@@ -1,7 +1,5 @@
 import { DB_TABLES } from "@shared/enums/db-tables.enum";
-// import { ObjectLiteral } from "@shared/types/object-literal.type";
 import { Model, ModelObject } from "objection";
-
 
 export class Wallet extends Model {
   static tableName = DB_TABLES.WALLETS;

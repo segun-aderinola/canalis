@@ -1,54 +1,57 @@
 import { DB_TABLES } from "@shared/enums/db-tables.enum";
-// import { ObjectLiteral } from "@shared/types/object-literal.type";
 import { Model, ModelObject } from "objection";
 import bcrypt from "bcrypt";
-// import { Role } from "./Role";  // Import Role model
+import { Role } from "../../accessControlManagement/model/role.model";
 
 const SALT_ROUNDS = 10;
 
 export class User extends Model {
   static tableName = DB_TABLES.USERS;
   id!: string;
-  name!: string;
+  firstName!: string;
+  lastName!: string;
+  middleName!: string;
   email!: string;
   password!: string;
   phoneNumber!: string;
   address?: string;
   avatar?: string;
-  idType!: string;
-  idNumber!: string;
   region!: string;
-  roleId!: string;           // For role-based access control
+  role!: string;
   supervisorId?: string;
   status!: string;
-  hasChangedPassword!: boolean;
-  createdAt!: Date;
-  updatedAt!: Date;
-
+  isDefaultPassword!: boolean;
+  signature!: string;
+  transactionPin!: string;
+  refreshToken!: string;
+  addedBy!: string;
   
-  // static relationMappings = {
-  //   role: {
-  //     relation: Model.BelongsToOneRelation,
-  //     modelClass: Role,
-  //     join: {
-  //       from: 'users.roleId',
-  //       to: 'roles.id',
-  //     },
-  //   },
-  // };
+  static relationMappings = {
+    userRole: {
+      relation: Model.BelongsToOneRelation,
+      modelClass: Role,
+      join: {
+        from: 'users.role',
+        to: 'roles.id',
+      },
+    },
+  };
 
   async $beforeInsert(): Promise<void> {
-    this.createdAt = new Date();
-    this.updatedAt = new Date();
     if (this.password) {
       this.password = await bcrypt.hash(this.password, SALT_ROUNDS);
+    }
+    if (this.transactionPin) {
+      this.transactionPin = await bcrypt.hash(this.transactionPin, SALT_ROUNDS);
     }
   }
 
   async $beforeUpdate(): Promise<void> {
-    this.updatedAt = new Date();
     if (this.password) {
       this.password = await bcrypt.hash(this.password, SALT_ROUNDS);
+    }
+    if (this.transactionPin) {
+      this.transactionPin = await bcrypt.hash(this.transactionPin, SALT_ROUNDS);
     }
   }
 

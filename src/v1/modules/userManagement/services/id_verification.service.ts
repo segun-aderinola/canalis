@@ -1,15 +1,13 @@
-import logger from "@shared/utils/logger";
 import { injectable } from "tsyringe";
-import { IDVerification } from "../model/id_verification.mdel";
 import IDVerificationFactory from "../factories/id_verification.factory";
-import IDVerificationRepo from "../repositories/id_verification.repo";
+import IdVerificationRepository from "../repositories/id_verification.repository";
+import logger from "@shared/utils/logger";
 @injectable()
 class IDVerificationService {
-  constructor(private readonly idVerificationRepo: IDVerificationRepo) {}
+  constructor(private readonly idVerificationRepository: IdVerificationRepository) {}
 
   async idVerification(data: { userId: string; idNumber: string; idType: string }) {
     try {
-      // Simulate calling a third-party service to verify the ID
       const result = {
         userId: data.userId,
         issuingDate: "20-10-2009",
@@ -18,13 +16,11 @@ class IDVerificationService {
         idNumber: data.idNumber,
       };
   
-      // Log the verification result without passing 'res'
       const logID = await this.logVerification(result);
   
-      // Return the log ID or result for further use if needed
       return logID;
     } catch (error: any) {
-      // Instead of returning res, throw an error for the controller to handle
+      logger.error({ error: error.message }, "Error Verifying ID")
       throw new Error(`ID verification failed: ${error.message}`);
     }
   }
@@ -33,13 +29,11 @@ class IDVerificationService {
   async logVerification(data) {
     const user = IDVerificationFactory.idVerification(data);
     try {
-      // Save the verification log to the repository
-      const logID = await this.idVerificationRepo.save(user);
+      const logID = await this.idVerificationRepository.save(user);
   
-      // Return log ID for use in other parts of the service/controller
       return logID;
     } catch (error: any) {
-      // Throw an error instead of handling HTTP response here
+      logger.error({ error: error.message }, "Error verifying ID")
       throw new Error(`Logging verification failed: ${error.message}`);
     }
   }

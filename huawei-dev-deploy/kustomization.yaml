@@ -1,0 +1,11 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+- Deploy.yaml
+- service.yaml
+- configmap.yml
+
+images:
+  - name: REGISTRY/PROJECT_ID/IMAGE
+    newName: swr.af-south-1.myhuaweicloud.com/canalis-dev/ca/agency-base-service

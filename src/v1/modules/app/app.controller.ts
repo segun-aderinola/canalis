@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { Response } from "express";
 import { injectable } from "tsyringe";
 import AppService from "./app.service";
 
@@ -6,7 +6,7 @@ import AppService from "./app.service";
 class AppController {
   constructor(private appService: AppService) {}
 
-  getHello = async (req: Request, res: Response) => {
+  getHello = async (res: Response) => {
     res.send(this.appService.getHello());
   };
 }

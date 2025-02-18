@@ -1,5 +1,4 @@
 import { injectable } from "tsyringe";
-import { CreateWallet } from "../dtos/create-wallet.dto";
 import { addMinutes } from "date-fns";
 import OTPRepo from "../repositories/otp.repo";
 import { resetPasswordMail } from "@shared/mailer/resetPasswordMail";
@@ -11,10 +10,8 @@ class OTPService {
   constructor(private readonly otpRepo: OTPRepo) {}
 
   async sendOTP(data: { user: IUser, token: string, otpType: string }) {
-    const OTP_VALIDITY_DURATION = 10; // OTP valid for 10 minutes
+    const OTP_VALIDITY_DURATION = 10;
       const expiryDate = addMinutes(new Date(), OTP_VALIDITY_DURATION);
-    //   const localExpiryDate = expiryDate.toLocaleString('en-US', { timeZone: 'Africa/Lagos' });
-        console.log(expiryDate)
       const checkUnUsedOTP = await this.otpRepo.findOne({
         userId: data.user.id,
         status: 0,
@@ -35,9 +32,8 @@ class OTPService {
         });
       }
 
-      //send to the link via email
       const mail = {
-        name: data.user?.name,
+        name: data.user?.firstName,
         email: data.user.email,
         subject: "Password Reset Notification",
         otp: data.token,

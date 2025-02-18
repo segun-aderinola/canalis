@@ -3,6 +3,7 @@ import { v4 as uuid } from "uuid";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import { createObjectCsvStringifier } from 'csv-writer';
+import appConfig from "@config/app.config";
 
 dotenv.config();
 export const GetRandomID = (maxLength: number = 30): string => {
@@ -67,13 +68,44 @@ export const generateToken = async () => {
 };
 
 export const generateJwtToken = async (user: any) => {
-  const secret_key: any = process.env.JWT_SECRET;
-  const session = process.env.SESSION;
-  const token = jwt.sign({ userId: user.id }, secret_key, { expiresIn: session });
+  const secret_key: any = appConfig.jwt_token.secret;
+  const session = appConfig.jwt_token.session;
+  const token = jwt.sign(
+		{
+			user: {
+				id: user.id,
+				accessGroup: user.role,
+				email: user.email,
+				name: `${user.firstName} ${user.lastName}`,
+				phoneNumber: user.phoneNumber,
+			},
+		},
+		secret_key,
+		{ expiresIn: session }
+	);
   return token;
 };
 
-export async function exportCSVData(collectionName: string, headers: any, data: any) {
+export const generateRefreshToken = async (user: any) => {
+  const secret_key: any = appConfig.jwt_token.secret;
+  const session = appConfig.jwt_token.refresh_token_session;
+  const token = jwt.sign(
+		{
+			user: {
+				id: user.id,
+				accessGroup: user.role,
+				email: user.email,
+				name: `${user.firstName} ${user.lastName}`,
+				phoneNumber: user.phoneNumber,
+			},
+		},
+		secret_key,
+		{ expiresIn: session }
+	);
+  return token;
+};
+
+export async function exportCSVData(headers: any, data: any) {
   const csvStringifier = createObjectCsvStringifier({
     header: headers,
   });
@@ -118,3 +150,15 @@ export function stringToSlug(str: string) {
 export function format_number(number: number, locale = "en-US") {
   return new Intl.NumberFormat(locale).format(number);
 }
+
+export function isValidUUID(uuid) {
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  return uuidRegex.test(uuid);
+}
+
+export const generateTransactionReference = async (): Promise<string> => {
+  const timestamp = Date.now().toString().padStart(16, "0");
+  const randomDigits = crypto.randomBytes(8).toString("hex").padStart(16, "0");
+  const transactionReference = timestamp + randomDigits;
+  return transactionReference;
+};
