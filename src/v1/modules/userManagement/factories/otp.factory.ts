@@ -1,6 +1,5 @@
 import { CreateOTP } from "../dtos/create-otp.dto";
-import { IOTP } from "../model/otp.model";
-
+import { IOTP } from "../model/otp.mdel";
 
 class OTPFactory {
   static createOTP(data: CreateOTP) {
@@ -11,8 +10,6 @@ class OTPFactory {
     otp.otpType = data.otpType;
     otp.expiringDatetime = data.expiringDatetime;
     
-    
-
     return otp;
   }
 }

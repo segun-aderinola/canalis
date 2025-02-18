@@ -1,36 +1,37 @@
 import { injectable } from "tsyringe";
 import { addMinutes } from "date-fns";
-import OtpRepository from "../repositories/otp.repository";
+import OTPRepo from "../repositories/otp.repo";
+import { resetPasswordMail } from "@shared/mailer/resetPasswordMail";
 import { IUser } from "../model/user.model";
-import MailService from "./mail.service";
-import logger from "@shared/utils/logger";
 
 
 @injectable()
 class OTPService {
-  constructor(private readonly otpRepository: OtpRepository, private readonly mailService: MailService) {}
+  constructor(private readonly otpRepo: OTPRepo) {}
 
   async sendOTP(data: { user: IUser, token: string, otpType: string }) {
-    const OTP_VALIDITY_DURATION = 10; 
+    const OTP_VALIDITY_DURATION = 10;
       const expiryDate = addMinutes(new Date(), OTP_VALIDITY_DURATION);
-    
-      const checkUnUsedOTP = await this.otpRepository.findOne({
+      const checkUnUsedOTP = await this.otpRepo.findOne({
         userId: data.user.id,
-        status: 'pending',
+        status: 0,
       });
       if (checkUnUsedOTP) {
         const id = checkUnUsedOTP.id;
-        await this.otpRepository.updateById(id, {
-          status: 'expired'
+        await this.otpRepo.updateById(id, {
+          token: data.token,
+          expiringDatetime: expiryDate,
         });
-      }
-        await this.otpRepository.save({
+      } else {
+        await this.otpRepo.save({
           userId: data.user.id,
           token: data.token,
+          status: 0,
           expiringDatetime: expiryDate,
           otpType: data.otpType,
         });
-      
+      }
+
       const mail = {
         name: data.user?.firstName,
         email: data.user.email,
@@ -38,9 +39,9 @@ class OTPService {
         otp: data.token,
       };
       try {
-        await this.mailService.sendOTPMail(mail)
-      } catch (error: any) {
-        logger.error({error: error.message}, "Error sending OTP");
+        await resetPasswordMail(mail);
+      } catch (e) {
+        console.log(e);
       }
   }
 }

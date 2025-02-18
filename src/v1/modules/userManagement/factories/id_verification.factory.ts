@@ -1,9 +1,10 @@
-import { IdVerification } from "../dtos/create-id-verification.dto";
-import { IDV } from "../model/id_verification.model";
+// import { ObjectLiteral } from "@shared/types/object-literal.type";
+import { IDVerification } from "../dtos/create-id-verification.dto";
+import { IDV } from "../model/id_verification.mdel";
 
 
-class IdVerificationFactory {
-  static idVerification(data: IdVerification) {
+class IDVerificationFactory {
+  static idVerification(data: IDVerification) {
     const idVerification = {} as IDV;
 
     idVerification.userId = data.userId;
@@ -16,4 +17,4 @@ class IdVerificationFactory {
   }
 }
 
-export default IdVerificationFactory;
+export default IDVerificationFactory;

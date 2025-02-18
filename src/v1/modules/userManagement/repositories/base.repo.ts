@@ -1,6 +1,9 @@
 import { ObjectLiteral } from "@shared/types/object-literal.type";
 import { Model, Transaction } from "objection";
+<<<<<<< HEAD
 import { Wallet } from "../model/wallet.model";
+=======
+>>>>>>> 07a06d847cafdcd24c6ae461904bac18c3949e6a
 
 export class BaseRepository<T, M extends Model> {
   private model: typeof Model | any;
@@ -60,6 +63,7 @@ export class BaseRepository<T, M extends Model> {
     return await this.model.query().findOne({ email });
   }
 
+<<<<<<< HEAD
   
   async findByEmails(emails: string[]): Promise<any[]> {
     return this.model.query().whereIn('email', emails);
@@ -74,6 +78,8 @@ export class BaseRepository<T, M extends Model> {
     return await this.model.query().insert(users).returning('*');
   }
 
+=======
+>>>>>>> 07a06d847cafdcd24c6ae461904bac18c3949e6a
   async findOne(filter: ObjectLiteral): Promise<T | undefined> {
     return await this.model.query().where(filter).first();
   }
@@ -81,6 +87,7 @@ export class BaseRepository<T, M extends Model> {
   async findOneWhere(filter: ObjectLiteral): Promise<T | undefined> {
     return await this.model.query().where(filter)[0];
   }
+<<<<<<< HEAD
   async findOrWhere(
     filter: ObjectLiteral, 
     orFilter?: ObjectLiteral, 
@@ -149,6 +156,9 @@ export class BaseRepository<T, M extends Model> {
   }
   
   
+=======
+
+>>>>>>> 07a06d847cafdcd24c6ae461904bac18c3949e6a
   async findWhere(filter: ObjectLiteral, relations: string[] = []): Promise<T[]> {
     const query = this.model.query();
 
@@ -158,6 +168,7 @@ export class BaseRepository<T, M extends Model> {
 
     return await query.where(filter);
   }
+<<<<<<< HEAD
 
   async findAndCountAll(
     filter: ObjectLiteral, 
@@ -195,4 +206,6 @@ export class BaseRepository<T, M extends Model> {
     }
     return query.where(filter);
   }
+=======
+>>>>>>> 07a06d847cafdcd24c6ae461904bac18c3949e6a
 }

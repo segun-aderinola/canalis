@@ -6,9 +6,10 @@ class WalletFactory {
     const wallet = {} as IWallet;
 
     wallet.userId = data.userId;
-    wallet.walletId = data.walletId;
     wallet.accountNumber = data.accountNumber;
-
+    wallet.balance = 0.00;
+    wallet.ledgerBalance = 0.00;
+    
     return wallet;
   }
 }

@@ -1,8 +1,10 @@
 
-export type IdVerification = {
-    userId: string;
-    idType: string;
-    idNumber: string;
-    issuingDate: Date;
-    expiringDate: Date;
-  };
+export type IDVerification = {
+  userId: string;
+  idType: string;
+  idNumber: string;
+  issuingDate: Date;
+  expiringDate: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
+};

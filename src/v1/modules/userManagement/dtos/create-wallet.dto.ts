@@ -1,7 +1,9 @@
 
 export type CreateWallet = {
   userId: string;
-  walletId: string;
   accountNumber: string;
-  balance: number
+  balance: number;
+  ledgerBalance: number;
+  createdAt?: Date;
+  updatedAt?: Date;
 };

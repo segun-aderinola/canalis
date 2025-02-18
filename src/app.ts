@@ -22,6 +22,11 @@ class App {
 
 	constructor() {
     this.app = express();
+
+    this.app.use(express.json());
+    this.app.use(express.json({ limit: '100mb' }));
+    this.app.use(express.urlencoded({ limit: '100mb', extended: true }));
+
     bootstrapApp(this.app);
     this.registerModules();
     this.globalErrorHandler();

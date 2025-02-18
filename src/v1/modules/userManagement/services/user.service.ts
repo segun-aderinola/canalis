@@ -448,7 +448,6 @@ class UserService {
           role: user.role,
           status: user.status,
           account_number: wallet?.accountNumber || "N/A",
-          wallet_id: wallet?.walletId || "N/A",
         };
       });
 

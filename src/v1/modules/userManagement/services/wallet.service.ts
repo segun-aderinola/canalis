@@ -56,7 +56,6 @@ class WalletService {
         return {
           accountNumber: wallet.accountNumber,
           balance: wallet.balance,
-          walletId: wallet.walletId,
         };
       }
       return {

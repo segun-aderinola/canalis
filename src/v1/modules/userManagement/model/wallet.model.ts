@@ -5,9 +5,13 @@ export class Wallet extends Model {
   static tableName = DB_TABLES.WALLETS;
   id!: string;
   userId!: string;
-  walletId!: string;
   accountNumber!: string;
-  balance!: number
+  balance!: number;
+  ledgerBalance!: number;
+  createdAt!: Date;
+  updatedAt!: Date;
+
+
 }
 
 export type IWallet = ModelObject<Wallet>;
