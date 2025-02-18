@@ -112,6 +112,6 @@ This project includes a set of essential dependencies and development tools:
 
 ## Author
 
-This project was created and maintained by [Ayodeji Abodunrin](https://ayodejiabodunrin.com/). If you have any questions or feedback, feel free to reach out.
+This project was created and maintained by [Segun Aderinola](https://segunaderinola.com/). If you have any questions or feedback, feel free to reach out.
 
 ---
