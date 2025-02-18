@@ -38,8 +38,8 @@ class PolicyService {
     }
   }
 
-  public async getAll(_req: Request) {
-    return await this.policyRepository.getAll();
+  public async getAll(req: Request) {
+    return await this.policyRepository.findWhere({ agentId: req.user.id });
   }
 
   public async getPolicyByAgentId(req: Request) {

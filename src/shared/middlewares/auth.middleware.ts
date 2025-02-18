@@ -12,7 +12,6 @@ const authMiddleware = (req: Request, res: Response, done) => {
 
     const payload = jwt.decode(authToken);
     (req as any).user = payload.user;
-
     (req as any).accessToken = authToken;
     done();
   } catch (err) {

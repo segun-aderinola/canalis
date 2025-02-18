@@ -36,8 +36,6 @@ data:
   OBS_BUCKET_NAME: "agency-documents"
   MAX_CONCURRENT_UPLOADS: "5"
   REFRESH_TOKEN_SESSION: "360000000"
- 
- 
   apiVersion: v1
   kind: Secret
   metadata:

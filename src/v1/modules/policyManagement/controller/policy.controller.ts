@@ -12,7 +12,7 @@ class PolicyController {
 
   createPolicy = async (req: any, res: Response) => {
     try {
-      req.body.agentId = req.user.userId;
+      req.body.agentId = req.user.id;
       const policy = await this.policyService.createPolicy(req.body);
       return res
         .status(httpStatus.CREATED)
@@ -91,6 +91,17 @@ class PolicyController {
   };
 
   creationCallback = async (req: Request, res: Response) => {
+    try {
+      await this.policyService.creationCallback(req);
+      res.send(SuccessResponse("Operation successful"));
+    } catch (error: any) {
+      res
+        .status(500)
+        .json(ErrorResponse(error.message));
+    }
+  };
+
+  addBeneficiaryDetails = async (req: Request, res: Response) => {
     try {
       await this.policyService.creationCallback(req);
       res.send(SuccessResponse("Operation successful"));
