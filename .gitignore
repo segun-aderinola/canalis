@@ -26,3 +26,6 @@ package-lock.json
 .env
 .dump.rdb
 run-db-migration.sh
+
+/huawei-dev-deploy
+/azure-staging-deploy
